@@ -1,0 +1,17 @@
+PODS:
+  - FMDB (2.4):
+    - FMDB/standard
+  - FMDB/common (2.4)
+  - FMDB/standard (2.4):
+    - FMDB/common
+  - NTYCSVTable (0.3.1)
+
+DEPENDENCIES:
+  - FMDB
+  - NTYCSVTable
+
+SPEC CHECKSUMS:
+  FMDB: 0b2fa25e5264ef177973c0cb8c02c711107979aa
+  NTYCSVTable: dc65f4f84c212877b90516670bebea0b68bed7fa
+
+COCOAPODS: 0.34.2
