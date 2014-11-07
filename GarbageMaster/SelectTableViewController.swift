@@ -8,7 +8,13 @@
 
 import UIKit
 
+protocol SelectTableViewDelegate {
+    func selectTableViewDidChanged(SelectTableViewController)
+}
+
 class SelectTableViewController: UITableViewController {
+    
+    var delegate: SelectTableViewDelegate? = nil
     
     // AddViewControllerで選択された配列(garbageArrayやtimeArrayなど)
     var selectedArray: Array<AnyObject> = []
@@ -48,6 +54,7 @@ class SelectTableViewController: UITableViewController {
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         selectFlag = 1
+        arrayId = indexPath.row
         self.navigationController?.popViewControllerAnimated(true)
     }
 
@@ -97,8 +104,7 @@ class SelectTableViewController: UITableViewController {
     */
     
     override func viewDidDisappear(animated: Bool) {
-        if selectFlag != 1 {
-        }
+        delegate!.selectTableViewDidChanged(self)
     }
 
 }
