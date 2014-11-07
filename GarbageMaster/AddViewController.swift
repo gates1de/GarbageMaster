@@ -8,20 +8,20 @@
 
 import UIKit
 
-class AddViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class AddViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, SelectTableViewDelegate {
     
     var tableView: UITableView = UITableView()
     
     var garbageNameLabel: UILabel = UILabel()
     var backButton: UIButton = UIButton()
     
-    var selectTableViewController: SelectTableViewController = SelectTableViewController()
-    
     // SelectTableViewControllerで選択されたセル番号の格納用変数
     var garbageArray: Array<AnyObject> = []
     var timeArray: Array<AnyObject> = []
     var garbageArrayId = Int()
     var timeArrayId = Int()
+    var selectedGarbage = String()
+    var selectedTime = String()
     
     // enumeration用変数(flagの代わり)
     var itemArray = [Item.Garbage, Item.Time]
@@ -43,7 +43,7 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         let navigationBarHeight = self.navigationController?.navigationBar.frame.size.height
         let statusBarHeight = UIApplication.sharedApplication().statusBarFrame.size.height
         
-        tableView = UITableView(frame: CGRect(x: 0, y: 50, width: screenWidth, height: 60 * 3 + 40), style: UITableViewStyle.Grouped)
+        tableView = UITableView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: 60 * 3 + 40), style: UITableViewStyle.Grouped)
         tableView.scrollEnabled = false
         
         
@@ -55,7 +55,7 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         var backButtonWidth: CGFloat = 200
         var backButtonHeight: CGFloat = 30
         var backButtonX = (self.view.bounds.width - backButtonWidth) / 2
-        var backButtonY = (self.view.bounds.height - backButtonHeight) / 2
+        var backButtonY = (self.view.bounds.height - backButtonHeight) / 1.5
                 
         garbageNameLabel.frame = CGRectMake(labelX, labelY, labelWidth, labelHeight)
         garbageNameLabel.textAlignment = NSTextAlignment.Center
@@ -99,7 +99,7 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return 2
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -138,7 +138,24 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         let cellId: String = "Cell"
         let cell: UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: cellId)
         
-        cell.textLabel?.text = "cell\(indexPath.row)" as String
+        item = itemArray[indexPath.row].stringValue()
+        
+        if item == "Garbage" {
+            if garbageArrayId == -1 {
+                cell.textLabel?.text = "ごみを選択してください"
+            }
+            else {
+                cell.textLabel?.text = garbageArray[garbageArrayId] as String
+            }
+        }
+        else if item == "Time" {
+            if timeArrayId == -1 {
+                cell.textLabel?.text = "通知時間を選択してください"
+            }
+            else {
+                cell.textLabel?.text = timeArray[timeArrayId] as String
+            }
+        }
         
         return cell
     }
@@ -146,6 +163,8 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
     func tableView(tableView: UITableView!, didSelectRowAtIndexPath indexPath: NSIndexPath!) {
         
         item = itemArray[indexPath.row].stringValue()
+        
+        var selectTableViewController: SelectTableViewController = SelectTableViewController()
         
         // navigationBarの戻るボタンの文字を「back」にする
         var buckButtonItem = UIBarButtonItem(title: "back", style: UIBarButtonItemStyle.Plain, target: nil, action: nil)
@@ -158,6 +177,8 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
             selectTableViewController.selectedArray = timeArray
         }
         
+        selectTableViewController.delegate = self
+        
         // 画面遷移
          self.navigationController?.pushViewController(selectTableViewController, animated: true)
     }
@@ -168,13 +189,16 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         self.dismissViewControllerAnimated(true, completion: nil)
     }
 
-    func addViewDidChanged(selectTableViewController: SelectTableViewController) {
+    func selectTableViewDidChanged(selectTableViewController: SelectTableViewController) {
         if item == "Garbage" {
             garbageArrayId = selectTableViewController.arrayId
+            selectedGarbage = garbageArray[garbageArrayId] as String
         }
         else if item == "Time" {
             timeArrayId = selectTableViewController.arrayId
+            selectedTime = timeArray[timeArrayId] as String
         }
+        tableView.reloadData()
     }
     
     enum Item {
