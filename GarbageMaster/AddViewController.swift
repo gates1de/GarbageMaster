@@ -20,6 +20,8 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
     var timeArray: Array<AnyObject> = []
     var garbageArrayId = Int()
     var timeArrayId = Int()
+    var selectedGarbage = String()
+    var selectedTime = String()
     
     // enumeration用変数(flagの代わり)
     var itemArray = [Item.Garbage, Item.Time]
@@ -190,11 +192,11 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
     func selectTableViewDidChanged(selectTableViewController: SelectTableViewController) {
         if item == "Garbage" {
             garbageArrayId = selectTableViewController.arrayId
-            println(garbageArrayId)
+            selectedGarbage = garbageArray[garbageArrayId] as String
         }
         else if item == "Time" {
             timeArrayId = selectTableViewController.arrayId
-            println(timeArrayId)
+            selectedTime = timeArray[timeArrayId] as String
         }
         tableView.reloadData()
     }

@@ -104,7 +104,9 @@ class SelectTableViewController: UITableViewController {
     */
     
     override func viewDidDisappear(animated: Bool) {
-        delegate!.selectTableViewDidChanged(self)
+        if selectFlag == 1 {
+            delegate!.selectTableViewDidChanged(self)
+        }
     }
 
 }
