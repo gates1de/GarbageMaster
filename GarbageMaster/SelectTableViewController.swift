@@ -26,6 +26,7 @@ class SelectTableViewController: UITableViewController {
         super.viewDidLoad()
         
         self.title = "Item Select"
+        self.view.backgroundColor = UIColor.whiteColor()
         self.tableView.dataSource = self
         self.tableView.delegate = self
 
