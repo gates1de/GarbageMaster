@@ -22,17 +22,20 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
     var timeArrayId = Int()
     var selectedGarbage = String()
     var selectedTime = String()
+    var weekday = String()
     
     // enumeration用変数(flagの代わり)
     var itemArray = [Item.Garbage, Item.Time]
     var item = String()
+    
+    var databaseController: DatabaseController = DatabaseController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.title = "追加"
         
-        garbageArray = ["燃えるごみ", "燃えないごみ", "粗大ごみ"]
+        garbageArray = ["アイスノン", "アイスピック", "アイロン", "アイロン台", "アコーディオンカーテン"]
         timeArray = ["明日", "明後日", "3日後", "毎週月曜日"]
         // 選択されていない時は「〜を選択」という表示にするため, 未選択状態を初期設定しておく
         garbageArrayId = -1
@@ -189,6 +192,7 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         self.dismissViewControllerAnimated(true, completion: nil)
     }
 
+    // selectTableViewControllerでアイテムが選択された時に, 画面が戻るのでその時に選択されたアイテムを保存するメソッド
     func selectTableViewDidChanged(selectTableViewController: SelectTableViewController) {
         if item == "Garbage" {
             garbageArrayId = selectTableViewController.arrayId
@@ -198,6 +202,8 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
             timeArrayId = selectTableViewController.arrayId
             selectedTime = timeArray[timeArrayId] as String
         }
+        weekday = databaseController.getWeekday("青田", garbage_id: garbageArrayId + 1)
+        println("weekday in AddViewController = \(weekday)")
         tableView.reloadData()
     }
     

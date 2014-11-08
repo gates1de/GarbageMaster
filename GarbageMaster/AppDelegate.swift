@@ -29,7 +29,39 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.window.backgroundColor = UIColor.whiteColor()
         self.window.makeKeyAndVisible()
         
+        
+        // Notificationの設定
+        
+//        let action: UIMutableUserNotificationAction = UIMutableUserNotificationAction()
+//        action.identifier = "action"
+//        action.title = "Notification"
+//        action.activationMode = UIUserNotificationActivationMode.Foreground
+//        action.destructive = false
+//        action.authenticationRequired = false
+//        
+//        let category: UIMutableUserNotificationCategory = UIMutableUserNotificationCategory()
+//        category.identifier = "category"
+//        
+//        let defaultActions: NSArray = [action]
+//        category.setActions(defaultActions, forContext: UIUserNotificationActionContext.Default)
+//        
+//        let categories: NSSet = NSSet(object: category)
+        
+        let notificationTypes = UIUserNotificationType.Alert | UIUserNotificationType.Badge
+        
+        let notificationSettings: UIUserNotificationSettings = UIUserNotificationSettings(forTypes: notificationTypes, categories: nil)
+        
+        UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
+        
         return true
+    }
+    
+    func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
+        var alert = UIAlertView()
+        alert.title = "ごみ出し通知"
+        alert.message = notification.alertBody
+        alert.addButtonWithTitle(notification.alertAction!)
+        alert.show()
     }
 
     func applicationWillResignActive(application: UIApplication) {

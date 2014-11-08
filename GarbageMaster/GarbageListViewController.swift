@@ -19,7 +19,6 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     var afterFiveDaysGarbageList: Array<AnyObject> = []
     var afterSixDaysGarbageList: Array<AnyObject> = []
     var afterSevenDaysGarbageList: Array<AnyObject> = []
-    var afterOverOneWeekGarbageList: Array<AnyObject> = []
     
     var arrayList: Array<AnyObject> = []
     
@@ -37,24 +36,34 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     
     var addViewNavigationController: UINavigationController = UINavigationController()
     
+    var array: Array<AnyObject> = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        array = [1, "today", "07:00:00"]
     
-//        databaseController.initDb()
+//        notify(array)
+        databaseController.initDb()
 //        databaseController.selectQuery()
         
-//        parseCSV.parseCSV()
 //        getCSVData()
+//        parseCSV.parseGomibunbetsuCSV(databaseController)
+//        parseCSV.parseGomiyoubiCSV(databaseController)
+        
+//        databaseController.selectGarbages()
+//        databaseController.selectCollectionDays()
+        
         
         self.title = "GarbageList"
         
-        sectionList = ["今日", "明日", "明後日", "3日後", "4日後", "5日後", "6日後", "7日後", "それ以降"]
+        sectionList = ["今日", "明日", "明後日", "3日後", "4日後", "5日後", "6日後", "7日後"]
         //sectionList = ["今日", "明日"]
         todayGarbageList = ["燃えるゴミ", "燃えないゴミ", "ビン・カン", "ペットボトル", "粗大ゴミ"]
         tomorrowGarbageList = ["電池", "蛍光灯", "ネジ"]
-        afterOverOneWeekGarbageList = ["ダンボール", "バッテリー"]
+        afterSevenDaysGarbageList = ["ダンボール", "バッテリー"]
         
-        arrayList = [todayGarbageList, tomorrowGarbageList, dayAfterTomorrowGarbageList, afterThreeDaysGarbageList, afterFourDaysGarbageList, afterFiveDaysGarbageList, afterSixDaysGarbageList, afterSevenDaysGarbageList, afterOverOneWeekGarbageList]
+        arrayList = [todayGarbageList, tomorrowGarbageList, dayAfterTomorrowGarbageList, afterThreeDaysGarbageList, afterFourDaysGarbageList, afterFiveDaysGarbageList, afterSixDaysGarbageList, afterSevenDaysGarbageList]
         
         var count = arrayList.count
         
@@ -222,6 +231,7 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         let addViewController = AddViewController()
         addViewController.garbageNameLabel.text = "追加画面だよ"
         addViewController.backButton.titleLabel?.text = "戻る"
+        addViewController.databaseController = databaseController
         //addViewController.modalTransitionStyle = UIModalTransitionStyle.CoverVertical
         
         addViewNavigationController = UINavigationController(rootViewController: addViewController)
@@ -241,6 +251,23 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         let remoteCSVPath2 = NSURL.URLWithString("http://www.city.nagareyama.chiba.jp/dbps_data/_material_/localhost/gomibunbetu.csv".stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!)
         let CSVName2 = "gomibunbetsu.csv"
         parseCSV.getCSV(remoteCSVPath2, CSVName: CSVName2)
+    }
+    
+    func notify(item: Array<AnyObject>) {
+        let notificationCenter = NSNotificationCenter.defaultCenter()
+        notificationCenter.addObserver(self, selector: "testNotification:", name: "Test Notification", object: nil)
+        
+        var notification: UILocalNotification = UILocalNotification()
+        notification.category = "category"
+        notification.alertBody = "あぁ^~"
+        notification.alertAction = "OK"
+        notification.fireDate = NSDate(timeIntervalSinceNow: 10)
+        
+        UIApplication.sharedApplication().scheduleLocalNotification(notification)
+    }
+    
+    func testNotification(notification: NSNotification) {
+        println("test notification")
     }
     
     
