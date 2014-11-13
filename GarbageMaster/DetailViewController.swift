@@ -11,6 +11,7 @@ import UIKit
 class DetailViewController: UIViewController {
     
     var garbageNameLabel: UILabel = UILabel()
+    var garbageDataArray: AnyObject = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,6 +19,8 @@ class DetailViewController: UIViewController {
         self.title = "ViewController"
         
         self.view.backgroundColor = UIColor.whiteColor()
+        
+        println("garbageDataArray = \(garbageDataArray)")
         
         var labelWidth: CGFloat = 200
         var labelHeight: CGFloat = 30

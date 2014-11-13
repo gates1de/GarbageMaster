@@ -14,11 +14,11 @@ protocol SelectTableViewDelegate {
 
 class SelectTableViewController: UITableViewController {
     
-    var delegate: SelectTableViewDelegate? = nil
+    var selectTableViewDelegate: SelectTableViewDelegate? = nil
     
     // AddViewControllerで選択された配列(garbageArrayやtimeArrayなど)
     var selectedArray: Array<AnyObject> = []
-
+    
     var arrayId = Int()
     var selectFlag = Int()
     
@@ -55,7 +55,7 @@ class SelectTableViewController: UITableViewController {
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         selectFlag = 1
-        arrayId = indexPath.row
+        arrayId = indexPath.row + 1
         self.navigationController?.popViewControllerAnimated(true)
     }
 
@@ -106,7 +106,7 @@ class SelectTableViewController: UITableViewController {
     
     override func viewDidDisappear(animated: Bool) {
         if selectFlag == 1 {
-            delegate!.selectTableViewDidChanged(self)
+            selectTableViewDelegate!.selectTableViewDidChanged(self)
         }
     }
 

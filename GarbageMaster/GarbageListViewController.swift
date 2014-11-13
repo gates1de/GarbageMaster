@@ -8,17 +8,19 @@
 
 import UIKit
 
-class GarbageListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITabBarControllerDelegate {
+class GarbageListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITabBarControllerDelegate, AddViewDelegate {
 
     var sectionList: Array<AnyObject> = []
-    var todayGarbageList: Array<AnyObject> = []
-    var tomorrowGarbageList: Array<AnyObject> = []
-    var dayAfterTomorrowGarbageList: Array<AnyObject> = []
-    var afterThreeDaysGarbageList: Array<AnyObject> = []
-    var afterFourDaysGarbageList: Array<AnyObject> = []
-    var afterFiveDaysGarbageList: Array<AnyObject> = []
-    var afterSixDaysGarbageList: Array<AnyObject> = []
-    var afterSevenDaysGarbageList: Array<AnyObject> = []
+
+//    var todayGarbageList: Array<AnyObject> = []
+//    var tomorrowGarbageList: Array<AnyObject> = []
+//    var dayAfterTomorrowGarbageList: Array<AnyObject> = []
+//    var afterThreeDaysGarbageList: Array<AnyObject> = []
+//    var afterFourDaysGarbageList: Array<AnyObject> = []
+//    var afterFiveDaysGarbageList: Array<AnyObject> = []
+//    var afterSixDaysGarbageList: Array<AnyObject> = []
+//    var afterSevenDaysGarbageList: Array<AnyObject> = []
+
     
     var arrayList: Array<AnyObject> = []
     
@@ -40,30 +42,25 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        array = [1, "today", "07:00:00"]
-    
+
 //        notify(array)
         databaseController.initDb()
-//        databaseController.selectQuery()
         
 //        getCSVData()
+
+        self.title = "GarbageList"
+        
+        sectionList = ["今日", "明日", "明後日", "3日後", "4日後", "5日後", "6日後", "7日後", "それ以降"]
+       
+        // CSVデータをパースするとともに, 各テーブルにデータを挿入する
 //        parseCSV.parseGomibunbetsuCSV(databaseController)
 //        parseCSV.parseGomiyoubiCSV(databaseController)
-        
-//        databaseController.selectGarbages()
-//        databaseController.selectCollectionDays()
-        
         
         self.title = "GarbageList"
         
         sectionList = ["今日", "明日", "明後日", "3日後", "4日後", "5日後", "6日後", "7日後"]
-        //sectionList = ["今日", "明日"]
-        todayGarbageList = ["燃えるゴミ", "燃えないゴミ", "ビン・カン", "ペットボトル", "粗大ゴミ"]
-        tomorrowGarbageList = ["電池", "蛍光灯", "ネジ"]
-        afterSevenDaysGarbageList = ["ダンボール", "バッテリー"]
-        
-        arrayList = [todayGarbageList, tomorrowGarbageList, dayAfterTomorrowGarbageList, afterThreeDaysGarbageList, afterFourDaysGarbageList, afterFiveDaysGarbageList, afterSixDaysGarbageList, afterSevenDaysGarbageList]
+
+        arrayList = databaseController.getGarbageData()
         
         var count = arrayList.count
         
@@ -91,7 +88,7 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         scrollView.contentSize = CGSizeMake(screenWidth, screenHeight + 200)
         scrollView.pagingEnabled = true
         
-        tableView = UITableView(frame: CGRect(x: 0, y: navigationBarHeight! + statusBarHeight, width: screenWidth, height: screenHeight), style: UITableViewStyle.Grouped)
+        tableView = UITableView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight), style: UITableViewStyle.Grouped)
         tableView.backgroundColor = UIColor.clearColor()
         
 //        // buttonに関する記述(とっておいてるやつ)
@@ -107,14 +104,14 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         scrollView.addSubview(tableView)
         
         // 背景の画像を設定してブラーをかける処理
-        var image = UIImage(named: "background2.jpg")
-        var imageView = UIImageView(image: image)
-        imageView.frame = CGRectMake(0, 0, self.view.bounds.width, self.view.bounds.height)
-        var visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .Light)) as UIVisualEffectView
-        visualEffectView.frame = imageView.bounds
-        imageView.addSubview(visualEffectView)
-        
-        self.view.addSubview(imageView)
+//        var image = UIImage(named: "background2.jpg")
+//        var imageView = UIImageView(image: image)
+//        imageView.frame = CGRectMake(0, 0, self.view.bounds.width, self.view.bounds.height)
+//        var visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .Light)) as UIVisualEffectView
+//        visualEffectView.frame = imageView.bounds
+//        imageView.addSubview(visualEffectView)
+//        
+//        self.view.addSubview(imageView)
         
         self.view.frame = CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight + 400)
         self.view.addSubview(scrollView)
@@ -160,7 +157,6 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         var sectionTitle: String = sectionList[section] as String
         // dataSourceからsectionのタイトルをキーとしてゴミリストの配列を取得
         var dataArray: Array<AnyObject> = dataSource.objectForKey(sectionTitle) as Array
-        //println(dataArray)
         let x: CGFloat = 0.0
         let y: CGFloat = 40.0
         let height: CGFloat = 80.0 * CGFloat(dataArray.count)
@@ -174,16 +170,20 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     }
     
     func tableView(tableView: UITableView!, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+        // println("indexPath.section = \(indexPath.section), indexPath.row = \(indexPath.row)")
+
         
         var sectionTitle: String = sectionList[indexPath.section] as String
         var dataArray: Array<AnyObject> = dataSource.objectForKey(sectionTitle) as Array
         
         if editingStyle == .Delete {
-            NSLog("Delete = %@", dataArray[indexPath.row] as String)
+            NSLog("Delete = %@", dataArray[indexPath.row]["item"] as String)
+            var garbageListIdString: String = dataArray[indexPath.row]["garbageListId"] as String
+            databaseController.deleteGarbageData(garbageListIdString.toInt()!)
             dataArray.removeAtIndex(indexPath.row)
             dataSource.setValue(dataArray, forKey: sectionTitle)
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-            
+
             if dataArray.count == 0 {
                 dataSource.removeObjectForKey(sectionTitle)
                 sectionList.removeAtIndex(indexPath.section)
@@ -196,13 +196,15 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cellId: String = "Cell"
-        //println("indexPath.section = \(indexPath.section), indexPath.row = \(indexPath.row)")
         
         var sectionTitle: String = sectionList[indexPath.section] as String
         var dataArray: Array<AnyObject> = dataSource.objectForKey(sectionTitle) as Array
+        // println("\(dataArray)")
         
         let cell: UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: cellId)
-        cell.textLabel?.text = dataArray[indexPath.row] as String
+        cell.textLabel?.text = dataArray[indexPath.row]["item"] as String
+        cell.detailTextLabel?.text = dataArray[indexPath.row]["division"] as String
+        cell.detailTextLabel?.textColor = UIColor.redColor()
         return cell
     }
     
@@ -212,7 +214,8 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         var sectionTitle: String = sectionList[indexPath.section] as String
         var dataArray: Array<AnyObject> = dataSource.objectForKey(sectionTitle) as Array
         
-        detailViewController.garbageNameLabel.text = dataArray[indexPath.row] as String
+        detailViewController.garbageNameLabel.text = dataArray[indexPath.row]["item"] as String
+        detailViewController.garbageDataArray = dataArray[indexPath.row]
         
         // databaseController.insertQuery(dataArray[indexPath.row] as String)
         
@@ -231,7 +234,10 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         let addViewController = AddViewController()
         addViewController.garbageNameLabel.text = "追加画面だよ"
         addViewController.backButton.titleLabel?.text = "戻る"
+
         addViewController.databaseController = databaseController
+        addViewController.addViewDelegate = self
+
         //addViewController.modalTransitionStyle = UIModalTransitionStyle.CoverVertical
         
         addViewNavigationController = UINavigationController(rootViewController: addViewController)
@@ -266,9 +272,33 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         UIApplication.sharedApplication().scheduleLocalNotification(notification)
     }
     
+    func addViewDidChanged(addViewController: AddViewController) {
+        arrayList.removeAll(keepCapacity: false)
+        arrayList = addViewController.arrayList
+        sectionList = ["今日", "明日", "明後日", "3日後", "4日後", "5日後", "6日後", "7日後"]
+        var count = arrayList.count
+        
+        for (var i = 0; i < count; i++) {
+            if arrayList.count > i {
+                if arrayList[i].count == 0 {
+                    arrayList.removeAtIndex(i)
+                    sectionList.removeAtIndex(i)
+                    i--
+                }
+            }
+            else {
+                break
+            }
+        }
+        dataSource.removeAllObjects()
+        dataSource = NSMutableDictionary(objects: arrayList, forKeys: sectionList)
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.reloadData()
+    }
+    
     func testNotification(notification: NSNotification) {
         println("test notification")
     }
-    
     
 }

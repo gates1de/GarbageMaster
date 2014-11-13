@@ -8,25 +8,46 @@
 
 import UIKit
 
-class AddViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, SelectTableViewDelegate {
+protocol AddViewDelegate {
+    func addViewDidChanged(AddViewController)
+}
+
+class AddViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate, SelectTableViewDelegate {
+    
+    var addViewDelegate: AddViewDelegate? = nil
     
     var tableView: UITableView = UITableView()
     
     var garbageNameLabel: UILabel = UILabel()
     var backButton: UIButton = UIButton()
+    var addButton: UIButton = UIButton()
     
     // SelectTableViewControllerで選択されたセル番号の格納用変数
-    var garbageArray: Array<AnyObject> = []
+    var garbageItemArray: Array<AnyObject> = []
+    var dateArray: Array<AnyObject> = []
     var timeArray: Array<AnyObject> = []
-    var garbageArrayId = Int()
+    var garbageItemArrayId = Int()
     var timeArrayId = Int()
     var selectedGarbage = String()
+    var selectedDate = String()
     var selectedTime = String()
+
+    var initTime: NSDate = NSDate()
     var weekday = String()
+    
+    var dateFormatter: NSDateFormatter = NSDateFormatter()
+    
+    var datePickerView = UIPickerView()
+    var timePicker = UIDatePicker()
     
     // enumeration用変数(flagの代わり)
     var itemArray = [Item.Garbage, Item.Time]
     var item = String()
+    
+    // 入力したデータをGarbageListViewControllerの配列にも追加するための変数
+    var arrayList: Array<AnyObject> = []
+    
+    var addFlag = Int()
     
     var databaseController: DatabaseController = DatabaseController()
 
@@ -35,11 +56,22 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         
         self.title = "追加"
         
-        garbageArray = ["アイスノン", "アイスピック", "アイロン", "アイロン台", "アコーディオンカーテン"]
-        timeArray = ["明日", "明後日", "3日後", "毎週月曜日"]
+        dateFormatter.dateStyle = .MediumStyle
+        dateFormatter.timeStyle = .ShortStyle
+        dateFormatter.dateFormat = "HH:mm"
+        
+        garbageItemArray = databaseController.selectGarbages()
+        dateArray = ["ゴミ収集日の前日", "ゴミ収集日の当日"]
+        // 未入力を判定するために, 入力項目は初期値として空文字を設定する
+        selectedGarbage = ""
+        selectedDate = "ゴミ収集日の当日"
+        selectedTime = "07:00"
+        initTime = dateFormatter.dateFromString("07:00")!
+
         // 選択されていない時は「〜を選択」という表示にするため, 未選択状態を初期設定しておく
-        garbageArrayId = -1
+        garbageItemArrayId = -1
         timeArrayId = -1
+        addFlag = -1
         
         let screenHeight = UIScreen.mainScreen().applicationFrame.size.height
         let screenWidth = UIScreen.mainScreen().applicationFrame.size.width
@@ -64,13 +96,27 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         garbageNameLabel.textAlignment = NSTextAlignment.Center
         
         backButton = UIButton(frame: CGRect(x: backButtonX, y: backButtonY, width: backButtonWidth, height: backButtonHeight))
-        
         backButton.titleLabel?.text = "戻る"
         backButton.titleLabel?.textAlignment = NSTextAlignment.Center
-        backButton.titleLabel?.textColor = UIColor.cyanColor()
-        backButton.backgroundColor = UIColor.redColor()
-        
+        backButton.titleLabel?.textColor = UIColor.redColor()
+        backButton.backgroundColor = UIColor.cyanColor()
         backButton.addTarget(self, action: "back", forControlEvents: UIControlEvents.TouchUpInside)
+
+        
+        addButton = UIButton(frame: CGRect(x: 0, y: backButtonY + 50, width: screenWidth, height: backButtonHeight))
+        addButton.titleLabel?.text = "追加"
+        addButton.titleLabel?.textAlignment = NSTextAlignment.Center
+        addButton.titleLabel?.textColor = UIColor.cyanColor()
+        addButton.backgroundColor = UIColor.redColor()
+        addButton.addTarget(self, action: "addData", forControlEvents: UIControlEvents.TouchUpInside)
+        addButton.enabled = false
+        
+        datePickerView.frame = CGRectMake(0, tableView.frame.size.height + 10, screenWidth / 2, 100)
+        
+        timePicker.frame = CGRectMake(screenWidth / 2, tableView.frame.size.height + 10, screenWidth / 2, 100)
+        timePicker.datePickerMode = UIDatePickerMode.Time
+        timePicker.date = initTime
+        timePicker.addTarget(self, action: "selectTime", forControlEvents: UIControlEvents.ValueChanged)
         
         // 背景の画像を設定してブラーをかける処理
 //        var image = UIImage(named: "background.jpg")
@@ -85,9 +131,22 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         tableView.delegate = self
         tableView.dataSource = self
         
+        datePickerView.delegate = self
+        datePickerView.dataSource = self
+        // 通知の日付(ごみ出し日当日かごみ出し日前日)の初期値は「ごみ出し日当日」にしておく
+        datePickerView.selectRow(1, inComponent: 0, animated: false)
+        
         self.view.addSubview(tableView)
         //self.view.addSubview(garbageNameLabel)
         self.view.addSubview(backButton)
+        self.view.addSubview(addButton)
+        self.view.addSubview(datePickerView)
+        self.view.addSubview(timePicker)
+//        var viewsDictionary: Dictionary = ["datePicker" : datePicker]
+//        backButton.setTranslatesAutoresizingMaskIntoConstraints(false)
+//        datePicker.setTranslatesAutoresizingMaskIntoConstraints(false)
+//        var constraints = NSLayoutConstraint.constraintsWithVisualFormat("V:|-100-[datePicker]", options: NSLayoutFormatOptions(0), metrics: nil, views: viewsDictionary)
+//        backButton.addConstraints(constraints)
 
     }
 
@@ -102,7 +161,7 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 2
+        return 1
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -113,9 +172,9 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         return 40.0
     }
     
-    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "設定"
-    }
+//    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+//        return "設定"
+//    }
     
 //    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
 //        return self.view.bounds.height / 10
@@ -144,11 +203,11 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         item = itemArray[indexPath.row].stringValue()
         
         if item == "Garbage" {
-            if garbageArrayId == -1 {
+            if garbageItemArrayId == -1 {
                 cell.textLabel?.text = "ごみを選択してください"
             }
             else {
-                cell.textLabel?.text = garbageArray[garbageArrayId] as String
+                cell.textLabel?.text = garbageItemArray[garbageItemArrayId - 1] as String
             }
         }
         else if item == "Time" {
@@ -174,13 +233,13 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         self.navigationItem.backBarButtonItem = buckButtonItem
         
         if item == "Garbage" {
-            selectTableViewController.selectedArray = garbageArray
+            selectTableViewController.selectedArray = garbageItemArray
         }
         else if item == "Time" {
             selectTableViewController.selectedArray = timeArray
         }
         
-        selectTableViewController.delegate = self
+        selectTableViewController.selectTableViewDelegate = self
         
         // 画面遷移
          self.navigationController?.pushViewController(selectTableViewController, animated: true)
@@ -188,23 +247,80 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
     
     ///////////////////////////////// TableViewを使った処理 ここまで /////////////////////////////////
     
+    
+    ///////////////////////////////// PickerViewを使った処理 ここから /////////////////////////////////
+    
+    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int{
+        return dateArray.count
+    }
+    
+    func pickerView(pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
+        return 100.0
+    }
+    
+    func pickerView(pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+        return 32.0
+    }
+    
+    func pickerView(pickerView: UIPickerView!, titleForRow row: Int, forComponent component: Int) -> String!{
+        return "\(dateArray[row])"
+    }
+    
+    func pickerView(pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusingView view: UIView!) -> UIView {
+        var label: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: pickerView.frame.size.width, height: pickerView.frame.size.height))
+        label.numberOfLines = 0
+        label.font = UIFont.systemFontOfSize(18)
+        label.text = dateArray[row] as String
+        
+        return label
+    }
+    
+    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        selectedDate = dateArray[row] as String
+    }
+    
+    ///////////////////////////////// PickerViewを使った処理 ここまで /////////////////////////////////
+
     func back() {
+        self.dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    func addData() {
+        addFlag = 1
+        databaseController.insertGarbageLists([garbageItemArrayId, selectedDate, selectedTime])
         self.dismissViewControllerAnimated(true, completion: nil)
     }
 
     // selectTableViewControllerでアイテムが選択された時に, 画面が戻るのでその時に選択されたアイテムを保存するメソッド
     func selectTableViewDidChanged(selectTableViewController: SelectTableViewController) {
         if item == "Garbage" {
-            garbageArrayId = selectTableViewController.arrayId
-            selectedGarbage = garbageArray[garbageArrayId] as String
+            garbageItemArrayId = selectTableViewController.arrayId
+            selectedGarbage = garbageItemArray[garbageItemArrayId - 1] as String
         }
         else if item == "Time" {
             timeArrayId = selectTableViewController.arrayId
             selectedTime = timeArray[timeArrayId] as String
         }
-        weekday = databaseController.getWeekday("青田", garbage_id: garbageArrayId + 1)
-        println("weekday in AddViewController = \(weekday)")
+        
         tableView.reloadData()
+        addButtonEnabled()
+    }
+    
+    func selectTime() {
+        selectedTime = dateFormatter.stringFromDate(timePicker.date)
+    }
+    
+    func addButtonEnabled() {
+        if selectedGarbage == "" {
+            addButton.enabled = false
+        }
+        else {
+            addButton.enabled = true
+        }
     }
     
     enum Item {
@@ -216,6 +332,16 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
             case .Time:
                 return "Time"
             }
+        }
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        if addFlag == 1 {
+            func reload() -> Void {
+                arrayList = databaseController.getGarbageData()
+                return addViewDelegate!.addViewDidChanged(self)
+            }
+            reload()
         }
     }
 }
