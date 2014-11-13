@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3804D2771A146E1F008EA7A7 /* GarbageDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3804D2761A146E1F008EA7A7 /* GarbageDetailTableViewCell.swift */; };
 		384B7CA219EE7B9000208301 /* AddViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 384B7CA119EE7B9000208301 /* AddViewController.swift */; };
 		3861590419EAAD5F00FC6C89 /* DatabaseController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3861590319EAAD5F00FC6C89 /* DatabaseController.swift */; };
 		3875031F19FB456C008E3A5E /* SelectTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3875031E19FB456C008E3A5E /* SelectTableViewController.swift */; };
@@ -35,6 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3804D2761A146E1F008EA7A7 /* GarbageDetailTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GarbageDetailTableViewCell.swift; sourceTree = "<group>"; };
 		384B7CA119EE7B9000208301 /* AddViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddViewController.swift; sourceTree = "<group>"; };
 		386158FC19EA815300FC6C89 /* GarbageMaster-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GarbageMaster-Bridging-Header.h"; sourceTree = "<group>"; };
 		3861590319EAAD5F00FC6C89 /* DatabaseController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseController.swift; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 				38C5DCDC19EA783300969616 /* ParseCSV.swift */,
 				3861590319EAAD5F00FC6C89 /* DatabaseController.swift */,
 				386158FC19EA815300FC6C89 /* GarbageMaster-Bridging-Header.h */,
+				3804D2761A146E1F008EA7A7 /* GarbageDetailTableViewCell.swift */,
 				38BF82F119ED71EA0063D9E6 /* GarbageDetailTableViewCell.xib */,
 				384B7CA119EE7B9000208301 /* AddViewController.swift */,
 				3875031E19FB456C008E3A5E /* SelectTableViewController.swift */,
@@ -304,6 +307,7 @@
 				3861590419EAAD5F00FC6C89 /* DatabaseController.swift in Sources */,
 				3880DE8D19E90FA700DEE26D /* DetailViewController.swift in Sources */,
 				38C5DCDB19E94C2C00969616 /* GarbageListViewController.swift in Sources */,
+				3804D2771A146E1F008EA7A7 /* GarbageDetailTableViewCell.swift in Sources */,
 				3880DE8B19E90FA700DEE26D /* AppDelegate.swift in Sources */,
 				3875031F19FB456C008E3A5E /* SelectTableViewController.swift in Sources */,
 				38C5DCDD19EA783300969616 /* ParseCSV.swift in Sources */,

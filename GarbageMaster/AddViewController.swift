@@ -240,7 +240,7 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         }
         
         selectTableViewController.selectTableViewDelegate = self
-        
+        tableView.deselectRowAtIndexPath(indexPath, animated: false)
         // 画面遷移
          self.navigationController?.pushViewController(selectTableViewController, animated: true)
     }
