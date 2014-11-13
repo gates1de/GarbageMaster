@@ -54,6 +54,7 @@ class DatabaseController: NSObject {
     func selectGarbages() -> Array<AnyObject> {
         
         var garbageItemArray: Array<AnyObject> = []
+
         
         let sql = "SELECT * FROM garbages;"
 
@@ -274,6 +275,7 @@ class DatabaseController: NSObject {
         db.close()
         
         println("garbageListId = \(id) を削除しました.")
+
     }
     
 }

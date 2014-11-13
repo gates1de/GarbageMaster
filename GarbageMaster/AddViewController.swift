@@ -305,7 +305,7 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
             timeArrayId = selectTableViewController.arrayId
             selectedTime = timeArray[timeArrayId] as String
         }
-        
+
         tableView.reloadData()
         addButtonEnabled()
     }

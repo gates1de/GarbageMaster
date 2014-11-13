@@ -21,7 +21,6 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
 //    var afterSixDaysGarbageList: Array<AnyObject> = []
 //    var afterSevenDaysGarbageList: Array<AnyObject> = []
 
-    
     var arrayList: Array<AnyObject> = []
     
     var dataSource: NSMutableDictionary = [:]
