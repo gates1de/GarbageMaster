@@ -156,13 +156,13 @@ class DatabaseController: NSObject {
             // println("garbage_id = \(garbageId), item = \(item), notify_date = \(notifyDate), notify_time = \(notifyTime)")
             switch notifyDate {
                 case "ゴミ収集日の当日":
-                    var tempDictionary = ["garbageId" : "\(garbageId)", "item" : item, "division" : division, "attention" : attention, "garbageListId" : "\(garbageListId)", "notifyDate" : notifyDate, "notifyTime" : notifyTime]
+                    var tempDictionary = ["garbageId" : "\(garbageId)", "item" : item, "division" : division, "attention" : attention, "garbageListId" : "\(garbageListId)", "weekday" : weekday, "notifyDate" : notifyDate, "notifyTime" : notifyTime]
                     todayGarbageList.append(tempDictionary)
                 case "ゴミ収集日の前日":
-                    var tempDictionary = ["garbageId" : "\(garbageId)", "item" : item, "division" : division, "attention" : attention, "garbageListId" : "\(garbageListId)", "notifyDate" : notifyDate, "notifyTime" : notifyTime]
+                    var tempDictionary = ["garbageId" : "\(garbageId)", "item" : item, "division" : division, "attention" : attention, "garbageListId" : "\(garbageListId)", "weekday" : weekday, "notifyDate" : notifyDate, "notifyTime" : notifyTime]
                     tomorrowGarbageList.append(tempDictionary)
                 default:
-                    var tempDictionary = ["garbageId" : "\(garbageId)", "item" : item, "division" : division, "attention" : attention, "garbageListId" : "\(garbageListId)", "notifyDate" : notifyDate, "notifyTime" : notifyTime]
+                    var tempDictionary = ["garbageId" : "\(garbageId)", "item" : item, "division" : division, "attention" : attention, "garbageListId" : "\(garbageListId)", "weekday" : weekday, "notifyDate" : notifyDate, "notifyTime" : notifyTime]
                     afterSevenDaysGarbageList.append(tempDictionary)
             }
         }

@@ -87,7 +87,9 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         scrollView.contentSize = CGSizeMake(screenWidth, screenHeight + 200)
         scrollView.pagingEnabled = true
         
-        tableView = UITableView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight), style: UITableViewStyle.Grouped)
+        tableView = UITableView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight), style: UITableViewStyle.Plain)
+        tableView.tableFooterView = UIView(frame: CGRectZero)
+        tableView.tableFooterView?.hidden = true
         tableView.backgroundColor = UIColor.clearColor()
         
 //        // buttonに関する記述(とっておいてるやつ)
@@ -144,6 +146,10 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return self.view.bounds.height / 10
     }
+    
+    func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 0.0
+    }
 
 //    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 //        // sectionListから要素を文字列として取得(タイトルを取得)
@@ -160,8 +166,8 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         let y: CGFloat = 40.0
         let height: CGFloat = 80.0 * CGFloat(dataArray.count)
         //tableView.frame = CGRectMake(x, y, self.view.frame.width, height)
+        println("dataArray.count = \(dataArray.count)")
         return dataArray.count
-        //return 0
     }
     
     func tableView(tableView: UITableView!, canEditRowAtIndexPath indexPath: NSIndexPath!) -> Bool {
@@ -222,8 +228,23 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         var buckButtonItem = UIBarButtonItem(title: "back", style: UIBarButtonItemStyle.Plain, target: nil, action: nil)
         self.navigationItem.backBarButtonItem = buckButtonItem
         
+        tableView.deselectRowAtIndexPath(indexPath, animated: false)
         // 画面遷移
         self.navigationController?.pushViewController(detailViewController, animated: true)
+    }
+    
+    func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+        if(self.tableView.respondsToSelector(Selector("setSeparatorInset:"))){
+            self.tableView.separatorInset = UIEdgeInsetsZero
+        }
+        
+        if(self.tableView.respondsToSelector(Selector("setLayoutMargins:"))){
+            self.tableView.layoutMargins = UIEdgeInsetsZero
+        }
+        
+        if(cell.respondsToSelector(Selector("setLayoutMargins:"))){
+            cell.layoutMargins = UIEdgeInsetsZero
+        }
     }
     
 ///////////////////////////////// TableViewを使った処理 ここまで /////////////////////////////////
