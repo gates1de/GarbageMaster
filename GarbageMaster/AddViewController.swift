@@ -95,28 +95,32 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         garbageNameLabel.frame = CGRectMake(labelX, labelY, labelWidth, labelHeight)
         garbageNameLabel.textAlignment = NSTextAlignment.Center
         
-        backButton = UIButton(frame: CGRect(x: backButtonX, y: backButtonY, width: backButtonWidth, height: backButtonHeight))
-        backButton.titleLabel?.text = "戻る"
-        backButton.titleLabel?.textAlignment = NSTextAlignment.Center
-        backButton.titleLabel?.textColor = UIColor.redColor()
-        backButton.backgroundColor = UIColor.cyanColor()
-        backButton.addTarget(self, action: "back", forControlEvents: UIControlEvents.TouchUpInside)
-
-        
-        addButton = UIButton(frame: CGRect(x: 0, y: backButtonY + 50, width: screenWidth, height: backButtonHeight))
-        addButton.titleLabel?.text = "追加"
-        addButton.titleLabel?.textAlignment = NSTextAlignment.Center
-        addButton.titleLabel?.textColor = UIColor.cyanColor()
-        addButton.backgroundColor = UIColor.redColor()
-        addButton.addTarget(self, action: "addData", forControlEvents: UIControlEvents.TouchUpInside)
-        addButton.enabled = false
-        
         datePickerView.frame = CGRectMake(0, tableView.frame.size.height + 10, screenWidth / 2, 100)
         
         timePicker.frame = CGRectMake(screenWidth / 2, tableView.frame.size.height + 10, screenWidth / 2, 100)
         timePicker.datePickerMode = UIDatePickerMode.Time
         timePicker.date = initTime
         timePicker.addTarget(self, action: "selectTime", forControlEvents: UIControlEvents.ValueChanged)
+
+        
+        addButton = UIButton(frame: CGRect(x: 0, y: timePicker.frame.origin.y + timePicker.frame.size.height + 20, width: screenWidth, height: backButtonHeight))
+        addButton.titleLabel?.textAlignment = NSTextAlignment.Center
+        addButton.setTitle("追加する", forState: UIControlState.Normal)
+        addButton.setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
+        addButton.addTarget(self, action: "addData", forControlEvents: UIControlEvents.TouchUpInside)
+        addButton.enabled = false
+        
+        backButton = UIButton(frame: CGRect(x: backButtonX, y: addButton.frame.origin.y + addButton.frame.size.height + 20, width: backButtonWidth, height: backButtonHeight))
+        backButton.titleLabel?.textAlignment = NSTextAlignment.Center
+        backButton.setTitle("戻る", forState: UIControlState.Normal)
+        backButton.setTitleColor(UIColor(red: 0.2, green: 0.6, blue: 1.0, alpha: 1.0), forState: UIControlState.Normal)
+        //        backButton.layer.borderColor = UIColor.grayColor().CGColor
+        //        backButton.layer.borderWidth = 2.0
+        //        backButton.layer.cornerRadius = 5.0
+        backButton.addTarget(self, action: "back", forControlEvents: UIControlEvents.TouchUpInside)
+        
+        
+        
         
         // 背景の画像を設定してブラーをかける処理
 //        var image = UIImage(named: "background.jpg")
@@ -204,18 +208,18 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         
         if item == "Garbage" {
             if garbageItemArrayId == -1 {
-                cell.textLabel?.text = "ごみを選択してください"
+                cell.textLabel.text = "ごみを選択してください"
             }
             else {
-                cell.textLabel?.text = garbageItemArray[garbageItemArrayId - 1] as String
+                cell.textLabel.text = garbageItemArray[garbageItemArrayId - 1] as String
             }
         }
         else if item == "Time" {
             if timeArrayId == -1 {
-                cell.textLabel?.text = "通知時間を選択してください"
+                cell.textLabel.text = "通知時間を選択してください"
             }
             else {
-                cell.textLabel?.text = timeArray[timeArrayId] as String
+                cell.textLabel.text = timeArray[timeArrayId] as String
             }
         }
         
@@ -320,6 +324,7 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
         }
         else {
             addButton.enabled = true
+            addButton.setTitleColor(UIColor(red: 0.9, green: 0.28, blue: 0.25, alpha: 1.0), forState: UIControlState.Normal)
         }
     }
     

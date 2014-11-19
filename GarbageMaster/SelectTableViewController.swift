@@ -48,7 +48,7 @@ class SelectTableViewController: UITableViewController {
         let cellId: String = "Cell"
         let cell: UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: cellId)
         
-        cell.textLabel!.text = selectedArray[indexPath.row] as String
+        cell.textLabel.text = selectedArray[indexPath.row] as String
 
         return cell
     }

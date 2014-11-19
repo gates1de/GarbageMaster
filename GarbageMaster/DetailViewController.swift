@@ -18,6 +18,8 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     var screenHeight: CGFloat = CGFloat()
     var screenWidth: CGFloat = CGFloat()
+    
+    var cellHeight: CGFloat = CGFloat()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -86,33 +88,35 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("GarbageDetailTableViewCell", forIndexPath: indexPath) as GarbageDetailTableViewCell
-        cell.textLabel!.backgroundColor = UIColor.cyanColor()
+        cell.textLabel.backgroundColor = UIColor.cyanColor()
         cell.content.lineBreakMode = NSLineBreakMode.ByCharWrapping
         cell.content.numberOfLines = 0
         cell.content.frame.size.width = screenWidth * (3 / 4) - 20
         cell.content.frame.size.height = cell.frame.size.height
+        cell.content.font = UIFont.systemFontOfSize(16)
+        cellHeight = cell.frame.size.height
         switch(indexPath.row) {
             case 0:
-                cell.textLabel!.text = "分別区分"
+                cell.textLabel.text = "分別区分"
                 cell.content.text = garbageDataArray["division"] as String
                 cell.selectionStyle = UITableViewCellSelectionStyle.None
             case 1:
-                cell.textLabel!.text = "収集曜日"
+                cell.textLabel.text = "収集曜日"
                 cell.content.text = garbageDataArray["weekday"] as String
                 cell.selectionStyle = UITableViewCellSelectionStyle.None
             case 2:
-                cell.textLabel!.text = "通知時間"
+                cell.textLabel.text = "通知時間"
                 let notifyDate = garbageDataArray["notifyDate"] as String
                 let notifyTime = garbageDataArray["notifyTime"] as String
                 cell.content.text = "\(notifyDate)  の  \(notifyTime)"
                 cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
             case 3:
-                cell.textLabel!.text = "処分時の注意"
+                cell.textLabel.text = "処分時の注意"
                 cell.content.text = garbageDataArray["attention"] as String
                 cell.content.frame.size.height += 20
                 cell.selectionStyle = UITableViewCellSelectionStyle.None
             default:
-                cell.textLabel!.text = "?"
+                cell.textLabel.text = "?"
                 cell.content.text = "?"
         }
         return cell
@@ -129,6 +133,10 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
             let modifySize: CGSize = text.boundingRectWithSize(maxSize, options: NSStringDrawingOptions.UsesLineFragmentOrigin, attributes: attr, context: nil).size
             if modifySize.height <= 44.0 {
                 return 44.0
+            }
+            
+            if modifySize.height <= cellHeight {
+                return cellHeight + 20
             }
             
             return modifySize.height + 20

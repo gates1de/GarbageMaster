@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3804D2771A146E1F008EA7A7 /* GarbageDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3804D2761A146E1F008EA7A7 /* GarbageDetailTableViewCell.swift */; };
+		38155AE01A1A3C5300AB06F4 /* ConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38155ADF1A1A3C5300AB06F4 /* ConfigViewController.swift */; };
 		384B7CA219EE7B9000208301 /* AddViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 384B7CA119EE7B9000208301 /* AddViewController.swift */; };
 		3861590419EAAD5F00FC6C89 /* DatabaseController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3861590319EAAD5F00FC6C89 /* DatabaseController.swift */; };
 		3875031F19FB456C008E3A5E /* SelectTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3875031E19FB456C008E3A5E /* SelectTableViewController.swift */; };
@@ -19,7 +20,6 @@
 		3880DEA119E90FA700DEE26D /* GarbageMasterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3880DEA019E90FA700DEE26D /* GarbageMasterTests.swift */; };
 		38B9CBE319EEB602009C28ED /* background.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 38B9CBE219EEB602009C28ED /* background.jpg */; };
 		38B9CBE519EEB851009C28ED /* background2.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 38B9CBE419EEB851009C28ED /* background2.jpg */; };
-		38BF82F219ED71EA0063D9E6 /* GarbageDetailTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 38BF82F119ED71EA0063D9E6 /* GarbageDetailTableViewCell.xib */; };
 		38C5DCDB19E94C2C00969616 /* GarbageListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38C5DCDA19E94C2C00969616 /* GarbageListViewController.swift */; };
 		38C5DCDD19EA783300969616 /* ParseCSV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38C5DCDC19EA783300969616 /* ParseCSV.swift */; };
 		4A19827A60A55F7DDE2446EE /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 773EA41A83FB2EE67ABA613C /* libPods.a */; };
@@ -37,6 +37,7 @@
 
 /* Begin PBXFileReference section */
 		3804D2761A146E1F008EA7A7 /* GarbageDetailTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GarbageDetailTableViewCell.swift; sourceTree = "<group>"; };
+		38155ADF1A1A3C5300AB06F4 /* ConfigViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigViewController.swift; sourceTree = "<group>"; };
 		384B7CA119EE7B9000208301 /* AddViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddViewController.swift; sourceTree = "<group>"; };
 		386158FC19EA815300FC6C89 /* GarbageMaster-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GarbageMaster-Bridging-Header.h"; sourceTree = "<group>"; };
 		3861590319EAAD5F00FC6C89 /* DatabaseController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseController.swift; sourceTree = "<group>"; };
@@ -53,7 +54,6 @@
 		3880DEA019E90FA700DEE26D /* GarbageMasterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GarbageMasterTests.swift; sourceTree = "<group>"; };
 		38B9CBE219EEB602009C28ED /* background.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = background.jpg; sourceTree = "<group>"; };
 		38B9CBE419EEB851009C28ED /* background2.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = background2.jpg; sourceTree = "<group>"; };
-		38BF82F119ED71EA0063D9E6 /* GarbageDetailTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GarbageDetailTableViewCell.xib; sourceTree = "<group>"; };
 		38C5DCDA19E94C2C00969616 /* GarbageListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GarbageListViewController.swift; sourceTree = "<group>"; };
 		38C5DCDC19EA783300969616 /* ParseCSV.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParseCSV.swift; sourceTree = "<group>"; };
 		773EA41A83FB2EE67ABA613C /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -116,9 +116,9 @@
 				3861590319EAAD5F00FC6C89 /* DatabaseController.swift */,
 				386158FC19EA815300FC6C89 /* GarbageMaster-Bridging-Header.h */,
 				3804D2761A146E1F008EA7A7 /* GarbageDetailTableViewCell.swift */,
-				38BF82F119ED71EA0063D9E6 /* GarbageDetailTableViewCell.xib */,
 				384B7CA119EE7B9000208301 /* AddViewController.swift */,
 				3875031E19FB456C008E3A5E /* SelectTableViewController.swift */,
+				38155ADF1A1A3C5300AB06F4 /* ConfigViewController.swift */,
 			);
 			path = GarbageMaster;
 			sourceTree = "<group>";
@@ -216,6 +216,7 @@
 				TargetAttributes = {
 					3880DE8419E90FA700DEE26D = {
 						CreatedOnToolsVersion = 6.0.1;
+						DevelopmentTeam = HYP4BUD3C6;
 					};
 					3880DE9919E90FA700DEE26D = {
 						CreatedOnToolsVersion = 6.0.1;
@@ -247,7 +248,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				38BF82F219ED71EA0063D9E6 /* GarbageDetailTableViewCell.xib in Resources */,
 				38B9CBE319EEB602009C28ED /* background.jpg in Resources */,
 				3880DE9019E90FA700DEE26D /* Main.storyboard in Resources */,
 				3880DE9519E90FA700DEE26D /* LaunchScreen.xib in Resources */,
@@ -311,6 +311,7 @@
 				3880DE8B19E90FA700DEE26D /* AppDelegate.swift in Sources */,
 				3875031F19FB456C008E3A5E /* SelectTableViewController.swift in Sources */,
 				38C5DCDD19EA783300969616 /* ParseCSV.swift in Sources */,
+				38155AE01A1A3C5300AB06F4 /* ConfigViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,10 +441,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = GarbageMaster/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "GarbageMaster/GarbageMaster-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -454,9 +457,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				INFOPLIST_FILE = GarbageMaster/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "GarbageMaster/GarbageMaster-Bridging-Header.h";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

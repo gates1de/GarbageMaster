@@ -14,9 +14,13 @@ class DatabaseController: NSObject {
     var dbPath: String = String()
     var db: FMDatabase = FMDatabase()
     
+    var userDefaults: NSUserDefaults = NSUserDefaults()
+    
     func initDb() {
+        userDefaults = NSUserDefaults.standardUserDefaults()
         
         dbDirPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)
+        println("dirPath = \(dbDirPath[0])")
 
         dbPath = dbDirPath[0].stringByAppendingPathComponent("garbage_master.db")
         
@@ -111,7 +115,7 @@ class DatabaseController: NSObject {
     }
     
     func getGarbageData() -> Array<AnyObject> {
-        let region = "青田"
+        let region: String! = userDefaults.stringForKey("region")
         
         var arrayList: Array<AnyObject> = []
         
@@ -125,6 +129,8 @@ class DatabaseController: NSObject {
         var afterSevenDaysGarbageList: Array<AnyObject> = []
         
         let now: NSDate = NSDate()
+        let calendar: NSCalendar = NSCalendar(identifier: NSGregorianCalendar)!
+        let components: NSDateComponents = calendar.components(NSCalendarUnit.YearCalendarUnit | NSCalendarUnit.MonthCalendarUnit | NSCalendarUnit.WeekdayOrdinalCalendarUnit | NSCalendarUnit.WeekdayCalendarUnit | NSCalendarUnit.DayCalendarUnit | NSCalendarUnit.HourCalendarUnit | NSCalendarUnit.MinuteCalendarUnit, fromDate: now)
         let dateFormatter: NSDateFormatter = NSDateFormatter()
         
         dateFormatter.locale = NSLocale(localeIdentifier: "ja_JP")
@@ -133,6 +139,7 @@ class DatabaseController: NSObject {
         dateFormatter.timeStyle = .ShortStyle
         dateFormatter.dateFormat = "HH:mm"
         println("now = \(dateFormatter.stringFromDate(now))")
+        println("CURRENT year = \(components.year), month = \(components.month), day = \(components.day), weekdayOrdinal = \(components.weekdayOrdinal), weekday = \(components.weekday), hour = \(components.hour), minute = \(components.minute)")
         
         let sql = "SELECT garbage_lists.id as garbage_lists_id, garbages.*, garbage_lists.* FROM garbages, garbage_lists WHERE garbages.id = garbage_lists.garbage_id;"
         
@@ -150,8 +157,15 @@ class DatabaseController: NSObject {
             let notifyDate = results.stringForColumn("notify_date")
             let notifyTime = results.stringForColumn("notify_time")
             
-            let weekday = getWeekday(region, garbage_id: Int(garbageId))
+            let weekday = getWeekday(region, garbage_id: Int(garbageId)) as NSString
+            var weekdayNum: Int = Int()
 //            println("garbage weekday = \(weekday)")
+            
+            let range: NSRange = weekday.rangeOfString("月曜日")
+            if range.location != NSNotFound {
+                weekdayNum = Week.Monday.intValue()
+                println("weekdayNum = \(weekdayNum)")
+            }
             
             // println("garbage_id = \(garbageId), item = \(item), notify_date = \(notifyDate), notify_time = \(notifyTime)")
             switch notifyDate {
@@ -266,6 +280,28 @@ class DatabaseController: NSObject {
         //db.close()        
     }
     
+    func getRegion() -> Array<AnyObject> {
+        var region = ""
+        var regionArray: Array<AnyObject> = []
+        
+        let sql = "SELECT region FROM collection_days;"
+        
+        db.open()
+        
+        let results = db.executeQuery(sql, withArgumentsInArray: nil)
+        
+        while results.next() {
+            region = results.stringForColumn("region")
+            regionArray.append(region)
+        }
+        
+        results.close()
+        
+        db.close()
+        
+        return regionArray
+    }
+    
     func deleteGarbageData(id: Int) {
         let sql = "DELETE FROM garbage_lists WHERE id = ?;"
         
@@ -276,6 +312,30 @@ class DatabaseController: NSObject {
         
         println("garbageListId = \(id) を削除しました.")
 
+    }
+    
+    enum Week {
+        case Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
+        func intValue() -> Int {
+            switch self {
+            case .Sunday:
+                return 1
+            case .Monday:
+                return 2
+            case .Tuesday:
+                return 3
+            case .Wednesday:
+                return 4
+            case .Thursday:
+                return 5
+            case .Friday:
+                return 6
+            case .Saturday:
+                return 7
+            default:
+                return -1
+            }
+        }
     }
     
 }

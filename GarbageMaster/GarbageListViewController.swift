@@ -10,6 +10,8 @@ import UIKit
 
 class GarbageListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITabBarControllerDelegate, AddViewDelegate {
 
+    var userDefaults: NSUserDefaults = NSUserDefaults()
+    
     var sectionList: Array<AnyObject> = []
 
 //    var todayGarbageList: Array<AnyObject> = []
@@ -36,24 +38,31 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     var databaseController: DatabaseController = DatabaseController()
     
     var addViewNavigationController: UINavigationController = UINavigationController()
+    var configViewNavigationController: UINavigationController = UINavigationController()
     
     var array: Array<AnyObject> = []
     
+    var region: String = String()
+    var startFlag: Int = Int()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        userDefaults = NSUserDefaults.standardUserDefaults()
+        
+        startFlag = userDefaults.integerForKey("start_flag")
+        
+        databaseController.initDb()
 
 //        notify(array)
-        databaseController.initDb()
-        
-//        getCSVData()
-
-        self.title = "GarbageList"
-        
-        sectionList = ["今日", "明日", "明後日", "3日後", "4日後", "5日後", "6日後", "7日後", "それ以降"]
-       
-        // CSVデータをパースするとともに, 各テーブルにデータを挿入する
-//        parseCSV.parseGomibunbetsuCSV(databaseController)
-//        parseCSV.parseGomiyoubiCSV(databaseController)
+        if startFlag == 0 {
+            getCSVData()
+            // databaseController.selectCollectionDays()
+            // CSVデータをパースするとともに, 各テーブルにデータを挿入する
+            parseCSV.parseGomibunbetsuCSV(databaseController)
+            parseCSV.parseGomiyoubiCSV(databaseController)
+            userDefaults.setObject(1, forKey: "start_flag")
+        }
         
         self.title = "GarbageList"
         
@@ -118,6 +127,11 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         self.view.addSubview(scrollView)
         
     }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(false)
+        regionCheck()
+    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -166,7 +180,6 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         let y: CGFloat = 40.0
         let height: CGFloat = 80.0 * CGFloat(dataArray.count)
         //tableView.frame = CGRectMake(x, y, self.view.frame.width, height)
-        println("dataArray.count = \(dataArray.count)")
         return dataArray.count
     }
     
@@ -207,7 +220,7 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         // println("\(dataArray)")
         
         let cell: UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: cellId)
-        cell.textLabel?.text = dataArray[indexPath.row]["item"] as String
+        cell.textLabel.text = dataArray[indexPath.row]["item"] as String
         cell.detailTextLabel?.text = dataArray[indexPath.row]["division"] as String
         cell.detailTextLabel?.textColor = UIColor.redColor()
         return cell
@@ -269,14 +282,14 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     
     func getCSVData() {
         // 各地域のごみ別収集曜日のCSVデータを取得
-        let remoteCSVPath1 = NSURL.URLWithString("http://www.city.nagareyama.chiba.jp/dbps_data/_material_/localhost/gomiyoubi_2.csv".stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!)
+        let remoteCSVPath1 = NSURL(string: "http://www.city.nagareyama.chiba.jp/dbps_data/_material_/localhost/gomiyoubi_2.csv".stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!)
         let CSVName1 = "gomiyoubi_2.csv"
-        parseCSV.getCSV(remoteCSVPath1, CSVName: CSVName1)
+        parseCSV.getCSV(remoteCSVPath1!, CSVName: CSVName1)
         
         // ごみの品目・区別・処分時注意のCSVデータを取得
-        let remoteCSVPath2 = NSURL.URLWithString("http://www.city.nagareyama.chiba.jp/dbps_data/_material_/localhost/gomibunbetu.csv".stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!)
+        let remoteCSVPath2 = NSURL(string: "http://www.city.nagareyama.chiba.jp/dbps_data/_material_/localhost/gomibunbetu.csv".stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!)
         let CSVName2 = "gomibunbetsu.csv"
-        parseCSV.getCSV(remoteCSVPath2, CSVName: CSVName2)
+        parseCSV.getCSV(remoteCSVPath2!, CSVName: CSVName2)
     }
     
     func notify(item: Array<AnyObject>) {
@@ -319,6 +332,24 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     
     func testNotification(notification: NSNotification) {
         println("test notification")
+    }
+    
+    func regionCheck() {
+        let region = userDefaults.stringForKey("region")
+        println("region = \(region)")
+
+        if region == nil {
+            let configViewController = ConfigViewController()
+            configViewController.label.text = "まずこの画面で地域の設定を行いましょう"
+            configViewController.button.titleLabel?.text = "戻る"
+            
+            configViewController.databaseController = databaseController
+            
+            configViewNavigationController = UINavigationController(rootViewController: configViewController)
+            configViewNavigationController.modalTransitionStyle = UIModalTransitionStyle.CoverVertical
+            
+            self.presentViewController(configViewNavigationController, animated: true, completion: nil)
+        }
     }
     
 }

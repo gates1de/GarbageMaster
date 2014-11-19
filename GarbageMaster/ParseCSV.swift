@@ -19,8 +19,8 @@ class ParseCSV: NSObject {
         //let remoteCSVPath = NSURL.URLWithString("http://www.city.nagareyama.chiba.jp/dbps_data/_material_/localhost/gomibunbetu.csv".stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!)
         
         // リモートからCSVのデータを取得
-        getData = NSData.dataWithContentsOfURL(remoteCSVPath, options: NSDataReadingOptions.DataReadingUncached, error: nil)
-        string = NSString(data: getData, encoding: NSShiftJISStringEncoding)
+        getData = NSData(contentsOfURL: remoteCSVPath, options: NSDataReadingOptions(), error: nil)
+        string = NSString(data: getData, encoding: NSShiftJISStringEncoding)!
         
         // 取得したCSVデータの文字コードがShiftJISであるため, 一旦UTF8に変換する
         let encodeString: NSString = string.stringByReplacingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!
@@ -59,7 +59,7 @@ class ParseCSV: NSObject {
                 caution = ""
             }
             
-            // println("rows \(i) = \(item), \(distinction), \(caution)")
+//             println("rows \(i) = \(item), \(distinction), \(caution)")
             
             databaseController.insertGomibuntetsu([item, distinction, caution])
         }
@@ -106,7 +106,7 @@ class ParseCSV: NSObject {
                 dangerousGarbageDay = ""
             }
             
-            // println("rows \(i) = \(region), \(combustiblesDay), \(plasticDay), \(incombustiblesDay), \(plasticBottleDay), \(dangerousGarbageDay)")
+//             println("rows \(i) = \(region), \(combustiblesDay), \(plasticDay), \(incombustiblesDay), \(plasticBottleDay), \(dangerousGarbageDay)")
             
             databaseController.insertGomiyoubi([region, combustiblesDay, plasticDay, incombustiblesDay, plasticBottleDay, dangerousGarbageDay])
         }
