@@ -164,7 +164,6 @@ class DatabaseController: NSObject {
             let range: NSRange = weekday.rangeOfString("月曜日")
             if range.location != NSNotFound {
                 weekdayNum = Week.Monday.intValue()
-                println("weekdayNum = \(weekdayNum)")
             }
             
             // println("garbage_id = \(garbageId), item = \(item), notify_date = \(notifyDate), notify_time = \(notifyTime)")

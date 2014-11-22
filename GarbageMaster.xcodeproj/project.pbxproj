@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		3804D2771A146E1F008EA7A7 /* GarbageDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3804D2761A146E1F008EA7A7 /* GarbageDetailTableViewCell.swift */; };
 		38155AE01A1A3C5300AB06F4 /* ConfigViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38155ADF1A1A3C5300AB06F4 /* ConfigViewController.swift */; };
+		381A3CC41A1F8EEB006CE0E1 /* GarbageMaster_Logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 381A3CC31A1F8EEB006CE0E1 /* GarbageMaster_Logo.png */; };
 		384B7CA219EE7B9000208301 /* AddViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 384B7CA119EE7B9000208301 /* AddViewController.swift */; };
 		3861590419EAAD5F00FC6C89 /* DatabaseController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3861590319EAAD5F00FC6C89 /* DatabaseController.swift */; };
 		3875031F19FB456C008E3A5E /* SelectTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3875031E19FB456C008E3A5E /* SelectTableViewController.swift */; };
@@ -38,6 +39,7 @@
 /* Begin PBXFileReference section */
 		3804D2761A146E1F008EA7A7 /* GarbageDetailTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GarbageDetailTableViewCell.swift; sourceTree = "<group>"; };
 		38155ADF1A1A3C5300AB06F4 /* ConfigViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConfigViewController.swift; sourceTree = "<group>"; };
+		381A3CC31A1F8EEB006CE0E1 /* GarbageMaster_Logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = GarbageMaster_Logo.png; sourceTree = "<group>"; };
 		384B7CA119EE7B9000208301 /* AddViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddViewController.swift; sourceTree = "<group>"; };
 		386158FC19EA815300FC6C89 /* GarbageMaster-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "GarbageMaster-Bridging-Header.h"; sourceTree = "<group>"; };
 		3861590319EAAD5F00FC6C89 /* DatabaseController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DatabaseController.swift; sourceTree = "<group>"; };
@@ -107,6 +109,7 @@
 				3880DE8C19E90FA700DEE26D /* DetailViewController.swift */,
 				38B9CBE219EEB602009C28ED /* background.jpg */,
 				38B9CBE419EEB851009C28ED /* background2.jpg */,
+				381A3CC31A1F8EEB006CE0E1 /* GarbageMaster_Logo.png */,
 				3880DE8E19E90FA700DEE26D /* Main.storyboard */,
 				3880DE9119E90FA700DEE26D /* Images.xcassets */,
 				3880DE9319E90FA700DEE26D /* LaunchScreen.xib */,
@@ -252,6 +255,7 @@
 				3880DE9019E90FA700DEE26D /* Main.storyboard in Resources */,
 				3880DE9519E90FA700DEE26D /* LaunchScreen.xib in Resources */,
 				38B9CBE519EEB851009C28ED /* background2.jpg in Resources */,
+				381A3CC41A1F8EEB006CE0E1 /* GarbageMaster_Logo.png in Resources */,
 				3880DE9219E90FA700DEE26D /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

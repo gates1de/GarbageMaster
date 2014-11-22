@@ -8,6 +8,12 @@
 
 import UIKit
 
+class CustomScrollView: UIScrollView {
+    override func scrollRectToVisible(rect: CGRect, animated: Bool) {
+        
+    }
+}
+
 class GarbageListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITabBarControllerDelegate, AddViewDelegate {
 
     var userDefaults: NSUserDefaults = NSUserDefaults()
@@ -27,9 +33,13 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     
     var dataSource: NSMutableDictionary = [:]
     
-    var scrollView: UIScrollView = UIScrollView()
+    var scrollView: UIScrollView = CustomScrollView()
     var tableView: UITableView = UITableView()
+    var logo: UIImage = UIImage()
+    var logoView: UIImageView = UIImageView()
     var button: UIButton = UIButton()
+    
+    var tabBarHeight: CGFloat = CGFloat()
     
     // NTYCSVTable専用変数
     var parseCSV: ParseCSV = ParseCSV()
@@ -91,41 +101,51 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         let screenWidth = UIScreen.mainScreen().applicationFrame.size.width
         let navigationBarHeight = self.navigationController?.navigationBar.frame.size.height
         let statusBarHeight = UIApplication.sharedApplication().statusBarFrame.size.height
-
-        scrollView = UIScrollView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight))
-        scrollView.contentSize = CGSizeMake(screenWidth, screenHeight + 200)
-        scrollView.pagingEnabled = true
+        //tabBarHeight = (self.tabBarController?.tabBar.frame.size.height)!
         
-        tableView = UITableView(frame: CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight), style: UITableViewStyle.Plain)
-        tableView.tableFooterView = UIView(frame: CGRectZero)
+        let logoViewWidth = screenWidth / 4 * 3
+        let logoViewHeight = screenHeight / 6
+        let logoViewX = (screenWidth - logoViewWidth) / 2
+        let logoViewY = navigationBarHeight! + statusBarHeight
+        
+        logo = UIImage(named: "GarbageMaster_Logo.png")!
+        logoView = UIImageView(image: logo)
+        logoView.frame = CGRectMake(logoViewX, logoViewY, logoViewWidth, logoViewHeight)
+
+//        self.automaticallyAdjustsScrollViewInsets = false
+//        scrollView.setTranslatesAutoresizingMaskIntoConstraints(true)
+//        scrollView = UIScrollView(frame: CGRect(x: 0, y: navigationBarHeight! + statusBarHeight, width: screenWidth, height: screenHeight))
+//        scrollView.contentSize = CGSizeMake(screenWidth, screenHeight + 200)
+//        scrollView.pagingEnabled = true
+
+        tableView = UITableView(frame: CGRect(x: 0, y: logoViewY + logoViewHeight, width: screenWidth, height: screenHeight - logoViewHeight - navigationBarHeight!), style: UITableViewStyle.Plain)
+        tableView.tableFooterView = UIView(frame: CGRectMake(0, 0, screenWidth, navigationBarHeight!))
         tableView.tableFooterView?.hidden = true
         tableView.backgroundColor = UIColor.clearColor()
         
 //        // buttonに関する記述(とっておいてるやつ)
-//        button = UIButton(frame: CGRect(x: 200, y: screenHeight - 100, width: 60, height: 20))
-//        button.setTitle("button", forState: .Normal)
-//        button.setTitleColor(UIColor.blueColor(), forState: .Normal)
-//        scrollView.addSubview(button)
+        button = UIButton(frame: CGRectMake(0, 0, screenWidth, navigationBarHeight!))
+        button.setTitle("button", forState: .Normal)
+        button.setTitleColor(UIColor.blueColor(), forState: .Normal)
         
         tableView.dataSource = self
         tableView.delegate = self
-        self.tabBarController?.delegate = self
+        //self.tabBarController?.delegate = self
         
         scrollView.addSubview(tableView)
         
         // 背景の画像を設定してブラーをかける処理
-//        var image = UIImage(named: "background2.jpg")
-//        var imageView = UIImageView(image: image)
-//        imageView.frame = CGRectMake(0, 0, self.view.bounds.width, self.view.bounds.height)
-//        var visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .Light)) as UIVisualEffectView
-//        visualEffectView.frame = imageView.bounds
-//        imageView.addSubview(visualEffectView)
-//        
-//        self.view.addSubview(imageView)
+        var image = UIImage(named: "background2.jpg")
+        var imageView = UIImageView(image: image)
+        imageView.frame = CGRectMake(0, 0, self.view.bounds.width, self.view.bounds.height)
+        var visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .Light)) as UIVisualEffectView
+        visualEffectView.frame = imageView.bounds
+        imageView.addSubview(visualEffectView)
         
-        self.view.frame = CGRect(x: 0, y: 0, width: screenWidth, height: screenHeight + 400)
-        self.view.addSubview(scrollView)
-        
+        // tableView.tableFooterView = button
+        self.view.addSubview(imageView)
+        self.view.addSubview(logoView)
+        self.view.addSubview(tableView)
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -140,10 +160,30 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
 ///////////////////////////////// ここからTableViewを使った処理 /////////////////////////////////
     
     func numberOfSectionsInTableView(tableView: UITableView!) -> Int {
-        return sectionList.count
+        // footerをheader代わりに使うため, sectionを一個分増やす
+        return sectionList.count + 1
     }
     
-    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+//    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+//        if section == 0 {
+//            return nil
+//        }
+//        var sectionTitle: String = sectionList[section - 1] as String
+//        
+//        var headerSectionLabel: UILabel = UILabel()
+//        headerSectionLabel.frame = CGRectMake(0, 0, self.view.bounds.width, self.view.bounds.height / 10)
+//        headerSectionLabel.backgroundColor = UIColor(red: 0.18, green: 0.8, blue: 0.44, alpha: 0.8)
+//        headerSectionLabel.textAlignment = NSTextAlignment.Center
+//        headerSectionLabel.text = sectionTitle
+//        headerSectionLabel.textColor = UIColor.whiteColor()
+//        
+//        return headerSectionLabel
+//    }
+    
+    func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        if section >= sectionList.count {
+            return nil
+        }
         var sectionTitle: String = sectionList[section] as String
         
         var headerSectionLabel: UILabel = UILabel()
@@ -156,13 +196,15 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         return headerSectionLabel
     }
     
-    
-    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return self.view.bounds.height / 10
-    }
+//    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+//        return self.view.bounds.height / 11
+//    }
     
     func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 0.0
+        if section >= sectionList.count {
+            return 0.0
+        }
+        return self.view.bounds.height / 11
     }
 
 //    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -173,7 +215,10 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
 //    }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        var sectionTitle: String = sectionList[section] as String
+        if section == 0 {
+            return 0
+        }
+        var sectionTitle: String = sectionList[section - 1] as String
         // dataSourceからsectionのタイトルをキーとしてゴミリストの配列を取得
         var dataArray: Array<AnyObject> = dataSource.objectForKey(sectionTitle) as Array
         let x: CGFloat = 0.0
@@ -215,7 +260,7 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cellId: String = "Cell"
         
-        var sectionTitle: String = sectionList[indexPath.section] as String
+        var sectionTitle: String = sectionList[indexPath.section - 1] as String
         var dataArray: Array<AnyObject> = dataSource.objectForKey(sectionTitle) as Array
         // println("\(dataArray)")
         
@@ -229,7 +274,7 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     func tableView(tableView: UITableView!, didSelectRowAtIndexPath indexPath: NSIndexPath!) {
         let detailViewController = DetailViewController()
         
-        var sectionTitle: String = sectionList[indexPath.section] as String
+        var sectionTitle: String = sectionList[indexPath.section - 1] as String
         var dataArray: Array<AnyObject> = dataSource.objectForKey(sectionTitle) as Array
         
         detailViewController.garbageNameLabel.text = dataArray[indexPath.row]["item"] as String
