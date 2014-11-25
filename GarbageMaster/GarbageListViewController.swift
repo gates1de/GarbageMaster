@@ -57,6 +57,7 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.title = "GarbageList"
         
         userDefaults = NSUserDefaults.standardUserDefaults()
         
@@ -73,30 +74,29 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
             parseCSV.parseGomiyoubiCSV(databaseController)
             userDefaults.setObject(1, forKey: "start_flag")
         }
+        else {
         
-        self.title = "GarbageList"
-        
-        sectionList = ["今日", "明日", "明後日", "3日後", "4日後", "5日後", "6日後", "7日後"]
+            sectionList = ["燃やすゴミ", "燃やさないゴミ", "容器包装プラスチック類", "ペットボトル", "資源ごみ", "粗大ごみ", "有害・危険ごみ", "処理困難物", "市では処理できないごみ", "家電リサイクル法対象品", "パソコンリサイクル対象品"]
 
-        arrayList = databaseController.getGarbageData()
+            arrayList = databaseController.getGarbageData()
         
-        var count = arrayList.count
+            var count = arrayList.count
         
-        for (var i = 0; i < count; i++) {
-            if arrayList.count > i {
-                if arrayList[i].count == 0 {
-                    arrayList.removeAtIndex(i)
-                    sectionList.removeAtIndex(i)
-                    i--
+            for (var i = 0; i < count; i++) {
+                if arrayList.count > i {
+                    if arrayList[i].count == 0 {
+                        arrayList.removeAtIndex(i)
+                        sectionList.removeAtIndex(i)
+                        i--
+                    }
+                }
+                else {
+                    break
                 }
             }
-            else {
-                break
-            }
+        
+            dataSource = NSMutableDictionary(objects: arrayList, forKeys: sectionList)
         }
-        
-        dataSource = NSMutableDictionary(objects: arrayList, forKeys: sectionList)
-        
         let screenHeight = UIScreen.mainScreen().applicationFrame.size.height
         let screenWidth = UIScreen.mainScreen().applicationFrame.size.width
         let navigationBarHeight = self.navigationController?.navigationBar.frame.size.height
@@ -130,7 +130,7 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         
         tableView.dataSource = self
         tableView.delegate = self
-        //self.tabBarController?.delegate = self
+        self.tabBarController?.delegate = self
         
         scrollView.addSubview(tableView)
         
@@ -146,6 +146,7 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         self.view.addSubview(imageView)
         self.view.addSubview(logoView)
         self.view.addSubview(tableView)
+        
     }
     
     override func viewDidAppear(animated: Bool) {
@@ -236,7 +237,7 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         // println("indexPath.section = \(indexPath.section), indexPath.row = \(indexPath.row)")
 
         
-        var sectionTitle: String = sectionList[indexPath.section] as String
+        var sectionTitle: String = sectionList[indexPath.section - 1] as String
         var dataArray: Array<AnyObject> = dataSource.objectForKey(sectionTitle) as Array
         
         if editingStyle == .Delete {
@@ -249,9 +250,14 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
 
             if dataArray.count == 0 {
                 dataSource.removeObjectForKey(sectionTitle)
-                sectionList.removeAtIndex(indexPath.section)
+                sectionList.removeAtIndex(indexPath.section - 1)
                 tableView.reloadData()
             }
+            reloadData(databaseController.getGarbageData())
+//            arrayList.removeAll(keepCapacity: false)
+//            arrayList = databaseController.getGarbageData()
+//            dataSource.removeAllObjects()
+//            dataSource = NSMutableDictionary(objects: arrayList, forKeys: sectionList)
         } else if editingStyle == .Insert {
             
         }
@@ -352,8 +358,15 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     
     func addViewDidChanged(addViewController: AddViewController) {
         arrayList.removeAll(keepCapacity: false)
-        arrayList = addViewController.arrayList
-        sectionList = ["今日", "明日", "明後日", "3日後", "4日後", "5日後", "6日後", "7日後"]
+        reloadData(addViewController.arrayList)
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.reloadData()
+    }
+    
+    func reloadData(list: Array<AnyObject>) {
+        arrayList = list
+        sectionList = ["燃やすゴミ", "燃やさないゴミ", "容器包装プラスチック類", "ペットボトル", "資源ごみ", "粗大ごみ", "有害・危険ごみ", "処理困難物", "市では処理できないごみ", "家電リサイクル法対象品", "パソコンリサイクル対象品"]
         var count = arrayList.count
         
         for (var i = 0; i < count; i++) {
@@ -370,9 +383,6 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         }
         dataSource.removeAllObjects()
         dataSource = NSMutableDictionary(objects: arrayList, forKeys: sectionList)
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.reloadData()
     }
     
     func testNotification(notification: NSNotification) {
@@ -381,11 +391,10 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     
     func regionCheck() {
         let region = userDefaults.stringForKey("region")
-        println("region = \(region)")
 
         if region == nil {
             let configViewController = ConfigViewController()
-            configViewController.label.text = "まずこの画面で地域の設定を行いましょう"
+            configViewController.label.text = "まずはこの画面で自分の住んでいる地域の設定を行いましょう!"
             configViewController.button.titleLabel?.text = "戻る"
             
             configViewController.databaseController = databaseController
@@ -394,6 +403,9 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
             configViewNavigationController.modalTransitionStyle = UIModalTransitionStyle.CoverVertical
             
             self.presentViewController(configViewNavigationController, animated: true, completion: nil)
+        }
+        else {
+            println("region = \(region)")
         }
     }
     

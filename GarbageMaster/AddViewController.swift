@@ -54,6 +54,11 @@ class AddViewController: UIViewController, UITableViewDataSource, UITableViewDel
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        var notificationArray = UIApplication.sharedApplication().scheduledLocalNotifications
+        for var i = 0; i < notificationArray.count; i++ {
+            println("fireDate = \(notificationArray[i].fireDate)")
+        }
+        
         self.title = "追加"
         
         dateFormatter.dateStyle = .MediumStyle

@@ -49,6 +49,7 @@ class ParseCSV: NSObject {
             var distinction = distinctionArray![i]
             var caution = cautionArray![i]
             
+            // 値が入っていなかった時は空文字を入れる
             if (item as NSObject == 0) {
                 item = ""
             }
@@ -59,9 +60,24 @@ class ParseCSV: NSObject {
                 caution = ""
             }
             
-//             println("rows \(i) = \(item), \(distinction), \(caution)")
+            // 「在宅医療用ビニールバッグ」と「木材」は, caution(attention)が別レコードになっているので, 繋げなければならない
+            if ((item as NSString).isEqualToString("在宅医療用ビニールバッグ") || (item as NSString).isEqualToString("木材")) {
+                caution = "\(cautionArray![i]) \(cautionArray![i + 1])"
+            }
             
-            databaseController.insertGomibuntetsu([item, distinction, caution])
+            // 「ハンガー」はitemが別レコードになっているので, 繋げなければならない
+            if ((item as NSString).isEqualToString("ハンガー")) {
+                item = "\(itemArray![i]) \(itemArray![i + 1])"
+            }
+            
+            // 「座布団」は3種類ある上に, 2つ目と3つ目のitemが別レコードになっている
+            if ((item as NSString).isEqualToString("座布団")) {
+                item = "\(itemArray![i]) \(itemArray![i + 1])"
+            }
+            
+            if (!(distinction as NSString).isEqualToString("")) {
+                databaseController.insertGomibuntetsu([item, distinction, caution])
+            }
         }
         
     }
