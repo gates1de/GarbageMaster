@@ -14,32 +14,28 @@ class CustomScrollView: UIScrollView {
     }
 }
 
-class GarbageListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITabBarControllerDelegate, AddViewDelegate {
+class GarbageListViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITabBarControllerDelegate, AddViewDelegate, NotifySettingViewDelegate {
 
     var userDefaults: NSUserDefaults = NSUserDefaults()
     
     var sectionList: Array<AnyObject> = []
-
-//    var todayGarbageList: Array<AnyObject> = []
-//    var tomorrowGarbageList: Array<AnyObject> = []
-//    var dayAfterTomorrowGarbageList: Array<AnyObject> = []
-//    var afterThreeDaysGarbageList: Array<AnyObject> = []
-//    var afterFourDaysGarbageList: Array<AnyObject> = []
-//    var afterFiveDaysGarbageList: Array<AnyObject> = []
-//    var afterSixDaysGarbageList: Array<AnyObject> = []
-//    var afterSevenDaysGarbageList: Array<AnyObject> = []
-
     var arrayList: Array<AnyObject> = []
+    var weekdayDictionary: Dictionary<String, String> = Dictionary<String, String>()
+    var garbageNotifyDataArray: Array<AnyObject> = []
     
     var dataSource: NSMutableDictionary = [:]
     
     var scrollView: UIScrollView = CustomScrollView()
     var tableView: UITableView = UITableView()
+    
     var logo: UIImage = UIImage()
     var logoView: UIImageView = UIImageView()
+    var noDataImage: UIImage = UIImage()
+    var noDataImageView: UIImageView = UIImageView()
     var button: UIButton = UIButton()
     
     var tabBarHeight: CGFloat = CGFloat()
+    var cellHeight: CGFloat = CGFloat()
     
     // NTYCSVTable専用変数
     var parseCSV: ParseCSV = ParseCSV()
@@ -55,9 +51,30 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     var region: String = String()
     var startFlag: Int = Int()
     
+    var alizarinColor: UIColor = UIColor()
+    var sunFlowerColor: UIColor = UIColor()
+    var peterRiverColor: UIColor = UIColor()
+    var emeraldColor: UIColor = UIColor()
+    var amethystColor: UIColor = UIColor()
+    var concreteColor: UIColor = UIColor()
+    var colorArray: Array<AnyObject> = []
+    var colorDictionary: Dictionary<String, UIColor> = Dictionary<String, UIColor>()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.title = "GarbageList"
+        self.title = "捨てるごみを追加"
+        self.navigationItem.title = "捨てるごみリスト"
+        region = ""
+        
+        alizarinColor = UIColor(red: 0.9, green: 0.3, blue: 0.25, alpha: 1.0)
+        sunFlowerColor = UIColor(red: 0.95, green: 0.76, blue: 0.06, alpha: 1.0)
+        peterRiverColor = UIColor(red: 0.2, green: 0.6, blue: 1.0, alpha: 1.0)
+        emeraldColor = UIColor(red: 0.18, green: 0.8, blue: 0.44, alpha: 0.8)
+        amethystColor = UIColor(red: 0.61, green: 0.35, blue: 0.71, alpha: 1.0)
+        concreteColor = UIColor(red: 0.58, green: 0.62, blue: 0.62, alpha: 1.0)
+        
+        colorArray = [alizarinColor, sunFlowerColor, peterRiverColor, emeraldColor, amethystColor, concreteColor]
+        colorDictionary = ["燃やすごみ" : alizarinColor, "容器包装プラスチック類" : sunFlowerColor, "燃やさないごみ" : peterRiverColor, "ペットボトル" : emeraldColor, "有害・危険ごみ" : amethystColor, "資源ごみ" : concreteColor, "粗大ごみ" : concreteColor, "処理困難物" : concreteColor, "市では処理できないごみ" : concreteColor, "家電リサイクル法対象品" : concreteColor, "パソコンリサイクル対象品" : concreteColor]
         
         userDefaults = NSUserDefaults.standardUserDefaults()
         
@@ -65,21 +82,32 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         
         databaseController.initDb()
 
-//        notify(array)
+        // 一度もアプリを開いたことがなければDBの初期化処理
         if startFlag == 0 {
             getCSVData()
-            // databaseController.selectCollectionDays()
             // CSVデータをパースするとともに, 各テーブルにデータを挿入する
             parseCSV.parseGomibunbetsuCSV(databaseController)
             parseCSV.parseGomiyoubiCSV(databaseController)
+            
+            databaseController.insertNotifyTime(["combustibles", 0, "07:00"])
+            databaseController.insertNotifyTime(["plastic", 0, "07:00"])
+            databaseController.insertNotifyTime(["incombustibles", 0, "07:00"])
+            databaseController.insertNotifyTime(["plasticBottle", 0, "07:00"])
+            databaseController.insertNotifyTime(["dangerousGarbage", 0, "07:00"])
+            garbageNotifyDataArray = databaseController.getNotifyTime()
+            
             userDefaults.setObject(1, forKey: "start_flag")
         }
         else {
-        
-            sectionList = ["燃やすゴミ", "燃やさないゴミ", "容器包装プラスチック類", "ペットボトル", "資源ごみ", "粗大ごみ", "有害・危険ごみ", "処理困難物", "市では処理できないごみ", "家電リサイクル法対象品", "パソコンリサイクル対象品"]
-
+            regionCheck()
+            println("region = \(region)")
+            if region != "" {
+            sectionList = ["燃やすごみ", "容器包装プラスチック類", "燃やさないごみ", "ペットボトル", "有害・危険ごみ", "資源ごみ", "粗大ごみ", "処理困難物", "市では処理できないごみ", "家電リサイクル法対象品", "パソコンリサイクル対象品"]
+            
+            garbageNotifyDataArray = databaseController.getNotifyTime()
             arrayList = databaseController.getGarbageData()
-        
+            weekdayDictionary = databaseController.weekdayDictionary
+            
             var count = arrayList.count
         
             for (var i = 0; i < count; i++) {
@@ -96,7 +124,13 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
             }
         
             dataSource = NSMutableDictionary(objects: arrayList, forKeys: sectionList)
+//            println("dataSource = \(dataSource)")
+            }
         }
+        
+        let rightBarButtonItem = UIBarButtonItem(title: "通知設定", style: UIBarButtonItemStyle.Plain, target: self, action: "toNotifySetting:")
+        self.navigationItem.setRightBarButtonItem(rightBarButtonItem, animated: false)
+        
         let screenHeight = UIScreen.mainScreen().applicationFrame.size.height
         let screenWidth = UIScreen.mainScreen().applicationFrame.size.width
         let navigationBarHeight = self.navigationController?.navigationBar.frame.size.height
@@ -108,7 +142,16 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         let logoViewX = (screenWidth - logoViewWidth) / 2
         let logoViewY = navigationBarHeight! + statusBarHeight
         
-        logo = UIImage(named: "GarbageMaster_Logo.png")!
+        let noDataImageViewWidth = screenWidth / 10 * 9
+        let noDataImageViewHeight = screenHeight / 5
+        let noDataImageViewX = (screenWidth - noDataImageViewWidth) / 2
+        let noDataImageViewY = screenHeight - noDataImageViewHeight - navigationBarHeight!
+        
+        noDataImage = UIImage(named: "GarbageMaster_Logo3.png")!
+        noDataImageView = UIImageView(image: noDataImage)
+        noDataImageView.frame = CGRectMake(noDataImageViewX, noDataImageViewY, noDataImageViewWidth, noDataImageViewHeight)
+        
+        logo = UIImage(named: "GarbageMaster_Logo1.png")!
         logoView = UIImageView(image: logo)
         logoView.frame = CGRectMake(logoViewX, logoViewY, logoViewWidth, logoViewHeight)
 
@@ -118,10 +161,15 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
 //        scrollView.contentSize = CGSizeMake(screenWidth, screenHeight + 200)
 //        scrollView.pagingEnabled = true
 
-        tableView = UITableView(frame: CGRect(x: 0, y: logoViewY + logoViewHeight, width: screenWidth, height: screenHeight - logoViewHeight - navigationBarHeight!), style: UITableViewStyle.Plain)
+        tableView = UITableView(frame: CGRect(x: 0, y: logoViewY + logoViewHeight, width: screenWidth, height: screenHeight - logoViewHeight - navigationBarHeight!), style: UITableViewStyle.Grouped)
         tableView.tableFooterView = UIView(frame: CGRectMake(0, 0, screenWidth, navigationBarHeight!))
         tableView.tableFooterView?.hidden = true
         tableView.backgroundColor = UIColor.clearColor()
+        tableView.rowHeight = UITableViewAutomaticDimension
+//        tableView.layer.borderColor = UIColor.blueColor().CGColor
+//        tableView.layer.borderWidth = 2.0
+//        tableView.layer.cornerRadius = 3.0
+
         
 //        // buttonに関する記述(とっておいてるやつ)
         button = UIButton(frame: CGRectMake(0, 0, screenWidth, navigationBarHeight!))
@@ -142,8 +190,14 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         visualEffectView.frame = imageView.bounds
         imageView.addSubview(visualEffectView)
         
-        // tableView.tableFooterView = button
+        // 各区分のごみの数を数えて格納する変数
+        var count = sectionList.count
+        println("count = \(count)")
+        
         self.view.addSubview(imageView)
+        if count == 0 {
+            self.view.addSubview(noDataImageView)
+        }
         self.view.addSubview(logoView)
         self.view.addSubview(tableView)
         
@@ -162,70 +216,56 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     
     func numberOfSectionsInTableView(tableView: UITableView!) -> Int {
         // footerをheader代わりに使うため, sectionを一個分増やす
-        return sectionList.count + 1
+//        return sectionList.count + 1
+        return sectionList.count
     }
     
-//    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-//        if section == 0 {
+    func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+//        if section >= sectionList.count {
 //            return nil
 //        }
-//        var sectionTitle: String = sectionList[section - 1] as String
-//        
-//        var headerSectionLabel: UILabel = UILabel()
-//        headerSectionLabel.frame = CGRectMake(0, 0, self.view.bounds.width, self.view.bounds.height / 10)
-//        headerSectionLabel.backgroundColor = UIColor(red: 0.18, green: 0.8, blue: 0.44, alpha: 0.8)
-//        headerSectionLabel.textAlignment = NSTextAlignment.Center
-//        headerSectionLabel.text = sectionTitle
-//        headerSectionLabel.textColor = UIColor.whiteColor()
-//        
-//        return headerSectionLabel
-//    }
-    
-    func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        if section >= sectionList.count {
-            return nil
-        }
         var sectionTitle: String = sectionList[section] as String
+        var weekday: String = String()
         
         var headerSectionLabel: UILabel = UILabel()
         headerSectionLabel.frame = CGRectMake(0, 0, self.view.bounds.width, self.view.bounds.height / 10)
-        headerSectionLabel.backgroundColor = UIColor(red: 0.18, green: 0.8, blue: 0.44, alpha: 0.8)
+        headerSectionLabel.backgroundColor = colorDictionary[sectionTitle]
         headerSectionLabel.textAlignment = NSTextAlignment.Center
-        headerSectionLabel.text = sectionTitle
+        headerSectionLabel.font = UIFont(name: "HelveticaNeue-Bold",size:16)
+        if sectionTitle == "資源ごみ" || sectionTitle == "粗大ごみ" || sectionTitle == "資源ごみ" || sectionTitle == "処理困難物" || sectionTitle == "市では処理できないごみ" || sectionTitle == "家電リサイクル法対象品" || sectionTitle == "パソコンリサイクル対象品" {
+            headerSectionLabel.text = sectionTitle
+        }
+        else {
+            println("sectionTitle = \(sectionTitle)")
+            weekday = weekdayDictionary[sectionTitle]!
+            headerSectionLabel.text = "\(sectionTitle) → 収集日 :  \(weekday)"
+        }
+
+//        headerSectionLabel.text = sectionTitle
         headerSectionLabel.textColor = UIColor.whiteColor()
         
         return headerSectionLabel
     }
-    
-//    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-//        return self.view.bounds.height / 11
-//    }
-    
-    func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        if section >= sectionList.count {
-            return 0.0
-        }
+        
+    func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+//        if section >= sectionList.count {
+//            return 0.0
+//        }
         return self.view.bounds.height / 11
     }
-
-//    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        // sectionListから要素を文字列として取得(タイトルを取得)
-//        var sectionTitle: String = sectionList[section] as String
-//        
-//        return sectionTitle
-//    }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 0 {
-            return 0
-        }
-        var sectionTitle: String = sectionList[section - 1] as String
+//        if section == 0 {
+//            return 0
+//        }
+//        var sectionTitle: String = sectionList[section - 1] as String
+        var sectionTitle: String = sectionList[section] as String
+
         // dataSourceからsectionのタイトルをキーとしてゴミリストの配列を取得
         var dataArray: Array<AnyObject> = dataSource.objectForKey(sectionTitle) as Array
         let x: CGFloat = 0.0
         let y: CGFloat = 40.0
         let height: CGFloat = 80.0 * CGFloat(dataArray.count)
-        //tableView.frame = CGRectMake(x, y, self.view.frame.width, height)
         return dataArray.count
     }
     
@@ -237,7 +277,8 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         // println("indexPath.section = \(indexPath.section), indexPath.row = \(indexPath.row)")
 
         
-        var sectionTitle: String = sectionList[indexPath.section - 1] as String
+//        var sectionTitle: String = sectionList[indexPath.section - 1] as String
+        var sectionTitle: String = sectionList[indexPath.section] as String
         var dataArray: Array<AnyObject> = dataSource.objectForKey(sectionTitle) as Array
         
         if editingStyle == .Delete {
@@ -250,7 +291,16 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
 
             if dataArray.count == 0 {
                 dataSource.removeObjectForKey(sectionTitle)
-                sectionList.removeAtIndex(indexPath.section - 1)
+//                sectionList.removeAtIndex(indexPath.section - 1)
+                sectionList.removeAtIndex(indexPath.section)
+                
+                var count = sectionList.count
+                println("count = \(count)")
+                
+                if count == 0 {
+                    self.view.addSubview(noDataImageView)
+                }
+
                 tableView.reloadData()
             }
             reloadData(databaseController.getGarbageData())
@@ -266,21 +316,32 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cellId: String = "Cell"
         
-        var sectionTitle: String = sectionList[indexPath.section - 1] as String
+//        var sectionTitle: String = sectionList[indexPath.section - 1] as String
+        var sectionTitle: String = sectionList[indexPath.section] as String
         var dataArray: Array<AnyObject> = dataSource.objectForKey(sectionTitle) as Array
         // println("\(dataArray)")
         
         let cell: UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: cellId)
         cell.textLabel.text = dataArray[indexPath.row]["item"] as String
-        cell.detailTextLabel?.text = dataArray[indexPath.row]["division"] as String
-        cell.detailTextLabel?.textColor = UIColor.redColor()
+        cell.textLabel.lineBreakMode = NSLineBreakMode.ByCharWrapping
+        cell.textLabel.numberOfLines = 0
+        //        cell.content.frame.size.width = screenWidth * (3 / 4) - 20
+        cell.textLabel.frame.size.height = cell.frame.size.height
+        cell.textLabel.font = UIFont.systemFontOfSize(16)
+        cellHeight = cell.frame.size.height
+        cell.textLabel.frame.size.height += 20
+//        cell.detailTextLabel?.text = dataArray[indexPath.row]["division"] as String
+//        cell.detailTextLabel?.textColor = UIColor.redColor()
+        cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
         return cell
     }
     
     func tableView(tableView: UITableView!, didSelectRowAtIndexPath indexPath: NSIndexPath!) {
         let detailViewController = DetailViewController()
         
-        var sectionTitle: String = sectionList[indexPath.section - 1] as String
+//        var sectionTitle: String = sectionList[indexPath.section - 1] as String
+        var sectionTitle: String = sectionList[indexPath.section] as String
+
         var dataArray: Array<AnyObject> = dataSource.objectForKey(sectionTitle) as Array
         
         detailViewController.garbageNameLabel.text = dataArray[indexPath.row]["item"] as String
@@ -289,8 +350,9 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         // databaseController.insertQuery(dataArray[indexPath.row] as String)
         
         // navigationBarの戻るボタンの文字を「back」にする
-        var buckButtonItem = UIBarButtonItem(title: "back", style: UIBarButtonItemStyle.Plain, target: nil, action: nil)
-        self.navigationItem.backBarButtonItem = buckButtonItem
+        let backButtonItem = UIBarButtonItem(title: "back", style: UIBarButtonItemStyle.Plain, target: nil, action: nil)
+        
+        self.navigationItem.backBarButtonItem = backButtonItem
         
         tableView.deselectRowAtIndexPath(indexPath, animated: false)
         // 画面遷移
@@ -358,7 +420,19 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     
     func addViewDidChanged(addViewController: AddViewController) {
         arrayList.removeAll(keepCapacity: false)
+        weekdayDictionary = addViewController.weekdayDictionary
         reloadData(addViewController.arrayList)
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.reloadData()
+    }
+    
+    func notifySettingViewDidChanged(notifySettingViewController: NotifySettingViewController) {
+        garbageNotifyDataArray = notifySettingViewController.garbageNotifyDataArray
+        weekdayDictionary = notifySettingViewController.weekdayDictionary
+        arrayList.removeAll(keepCapacity: false)
+        arrayList = notifySettingViewController.arrayList
+        reloadData(arrayList)
         tableView.delegate = self
         tableView.dataSource = self
         tableView.reloadData()
@@ -366,7 +440,7 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
     
     func reloadData(list: Array<AnyObject>) {
         arrayList = list
-        sectionList = ["燃やすゴミ", "燃やさないゴミ", "容器包装プラスチック類", "ペットボトル", "資源ごみ", "粗大ごみ", "有害・危険ごみ", "処理困難物", "市では処理できないごみ", "家電リサイクル法対象品", "パソコンリサイクル対象品"]
+        sectionList = ["燃やすごみ", "容器包装プラスチック類", "燃やさないごみ", "ペットボトル", "有害・危険ごみ", "資源ごみ", "粗大ごみ", "処理困難物", "市では処理できないごみ", "家電リサイクル法対象品", "パソコンリサイクル対象品"]
         var count = arrayList.count
         
         for (var i = 0; i < count; i++) {
@@ -383,6 +457,13 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
         }
         dataSource.removeAllObjects()
         dataSource = NSMutableDictionary(objects: arrayList, forKeys: sectionList)
+        var sectionListCount = sectionList.count
+        
+        if sectionListCount != 0 {
+            noDataImageView.removeFromSuperview()
+        }
+        
+        tableView.reloadData()
     }
     
     func testNotification(notification: NSNotification) {
@@ -405,8 +486,27 @@ class GarbageListViewController: UIViewController, UITableViewDataSource, UITabl
             self.presentViewController(configViewNavigationController, animated: true, completion: nil)
         }
         else {
+            self.region = region!
             println("region = \(region)")
         }
+    }
+    
+    func toNotifySetting(sender: UIButton) {
+        let notifySettingViewController = NotifySettingViewController()
+        // navigationBarの戻るボタンの文字を「back」にする
+        let backButtonItem = UIBarButtonItem(title: "back", style: UIBarButtonItemStyle.Plain, target: nil, action: nil)
+        
+        self.navigationItem.backBarButtonItem = backButtonItem
+        
+        notifySettingViewController.databaseController = databaseController
+        notifySettingViewController.arrayList = arrayList
+        notifySettingViewController.garbageNotifyDataArray = garbageNotifyDataArray
+        notifySettingViewController.notifySettingViewDelegate = self
+        
+        notifySettingViewController.hidesBottomBarWhenPushed = true
+        
+        // 画面遷移
+        self.navigationController?.pushViewController(notifySettingViewController, animated: true)
     }
     
 }

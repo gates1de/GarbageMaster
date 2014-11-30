@@ -40,13 +40,20 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
         var labelY = statusBarHeight + navigationBarHeight!
         
         garbageNameLabel.frame = CGRectMake(0, labelY, screenWidth, labelHeight)
+        garbageNameLabel.sizeToFit()
         garbageNameLabel.textColor = UIColor.whiteColor()
         garbageNameLabel.textAlignment = NSTextAlignment.Center
         garbageNameLabel.backgroundColor = UIColor(red: 0.16, green: 0.5, blue: 0.73, alpha: 1.0)
+        garbageNameLabel.lineBreakMode = NSLineBreakMode.ByCharWrapping
+        garbageNameLabel.numberOfLines = 0
+        garbageNameLabel.frame.size.width = screenWidth
+        garbageNameLabel.font = UIFont.systemFontOfSize(16)
+        garbageNameLabel.frame.size.height += 40
+        
         
         self.view.addSubview(garbageNameLabel)
         
-        tableView = UITableView(frame: CGRect(x: 0, y: labelY + labelHeight, width: screenWidth, height: screenHeight / 2))
+        tableView = UITableView(frame: CGRect(x: 0, y: garbageNameLabel.frame.origin.y + garbageNameLabel.frame.size.height, width: screenWidth, height: screenHeight / 2))
         tableView.registerClass(GarbageDetailTableViewCell.classForCoder(), forCellReuseIdentifier: "GarbageDetailTableViewCell")
         tableView.tableFooterView = UIView(frame: CGRectZero)
         tableView.tableFooterView?.hidden = true
@@ -71,11 +78,8 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        /*
-         * -4しているのは, garbage_idとgarbage_lists_idとitemはtableViewに表示しない,
-         * かつ, notifyDateとnotifyTimeを一緒のセルに表示するため
-        */
-        return garbageDataArray.count - 4
+        // -3しているのは, garbage_idとgarbage_lists_idとitemはtableViewに表示しないため
+        return garbageDataArray.count - 3
     }
     
     func tableView(tableView: UITableView!, canEditRowAtIndexPath indexPath: NSIndexPath!) -> Bool {
@@ -104,13 +108,13 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
                 cell.textLabel.text = "収集曜日"
                 cell.content.text = garbageDataArray["weekday"] as String
                 cell.selectionStyle = UITableViewCellSelectionStyle.None
+//            case 2:
+//                cell.textLabel.text = "通知時間"
+//                let notifyDate = garbageDataArray["notifyDate"] as String
+//                let notifyTime = garbageDataArray["notifyTime"] as String
+//                cell.content.text = "\(notifyDate)  の  \(notifyTime)"
+//                cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
             case 2:
-                cell.textLabel.text = "通知時間"
-                let notifyDate = garbageDataArray["notifyDate"] as String
-                let notifyTime = garbageDataArray["notifyTime"] as String
-                cell.content.text = "\(notifyDate)  の  \(notifyTime)"
-                cell.accessoryType = UITableViewCellAccessoryType.DisclosureIndicator
-            case 3:
                 cell.textLabel.text = "処分時の注意"
                 cell.content.text = garbageDataArray["attention"] as String
                 cell.content.frame.size.height += 20
@@ -125,7 +129,7 @@ class DetailViewController: UIViewController, UITableViewDelegate, UITableViewDa
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         let maxSize: CGSize = CGSizeMake(screenWidth, screenHeight);
         
-        if indexPath.row == 3 {
+        if indexPath.row == 2 {
             var text = garbageDataArray["attention"] as String
         
             let attr: Dictionary = [NSFontAttributeName: UIFont.boldSystemFontOfSize(17.0)]

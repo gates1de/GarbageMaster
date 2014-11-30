@@ -34,7 +34,7 @@ class ConfigViewController: UIViewController, UITableViewDelegate, UITableViewDa
         
         userDefaults = NSUserDefaults.standardUserDefaults()
 
-        self.title = "Garbage Master"
+        self.title = "地域の設定"
         
         region = ""
         regionArray = databaseController.getRegion()
@@ -51,38 +51,48 @@ class ConfigViewController: UIViewController, UITableViewDelegate, UITableViewDa
         var labelY = (self.view.bounds.width - labelHeight) / 3
         
         label = UILabel(frame: CGRect(x: labelX, y: labelY, width: labelWidth, height: labelHeight))
-        label.text = "この画面で自分の住んでいる地域を設定できます"
+        label.text = "この画面で自分の住んでいる地域を設定します"
         label.numberOfLines = 0
         label.textAlignment = NSTextAlignment.Center
         label.lineBreakMode = NSLineBreakMode.ByCharWrapping
         label.sizeToFit()
         
+        tableView = UITableView(frame: CGRect(x: 0, y: labelY + labelHeight + 20, width: screenWidth, height: 60), style: UITableViewStyle.Plain)
+        tableView.layer.borderColor = UIColor.blueColor().CGColor
+        tableView.layer.borderWidth = 2.0
+        tableView.layer.cornerRadius = 3.0
+        tableView.scrollEnabled = false
+        
         var buttonWidth: CGFloat = screenWidth / 2
         var buttonHeight: CGFloat = 30
         var buttonX = (self.view.bounds.width - buttonWidth) / 2
-        var buttonY = (self.view.bounds.height - buttonHeight) / 3 * 2
-        
+        var buttonY = tableView.frame.origin.y + tableView.frame.size.height + 20
+
         button = UIButton(frame: CGRect(x: buttonX, y: buttonY, width: buttonWidth, height: buttonHeight))
-        button.setTitle("設定", forState: UIControlState.Normal)
-        button.setTitleColor(UIColor.grayColor(), forState: UIControlState.Normal)
-        button.setTitleColor(UIColor(red: 0.2, green: 0.6, blue: 1.0, alpha: 1.0), forState: UIControlState.Highlighted)
+        button.setTitle("決定", forState: UIControlState.Normal)
+        button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
+//        button.setTitleColor(UIColor(red: 0.2, green: 0.6, blue: 1.0, alpha: 1.0), forState: UIControlState.Highlighted)
         button.titleLabel?.textAlignment = NSTextAlignment.Center
+        button.backgroundColor = UIColor.grayColor()
         button.layer.borderColor = UIColor.grayColor().CGColor
         button.layer.borderWidth = 2.0
         button.layer.cornerRadius = 5.0
         button.addTarget(self, action: "decideRegion", forControlEvents: UIControlEvents.TouchUpInside)
         button.enabled = false
         
-        tableView = UITableView(frame: CGRect(x: 0, y: labelY + labelHeight + 20, width: screenWidth, height: 60), style: UITableViewStyle.Plain)
-        tableView.layer.borderColor = UIColor.blueColor().CGColor
-        tableView.layer.borderWidth = 2.0
-        tableView.layer.cornerRadius = 3.0
         
-        tableView.scrollEnabled = false
         
         tableView.delegate = self
         tableView.dataSource = self
         
+        var image = UIImage(named: "background.jpg")
+        var imageView = UIImageView(image: image)
+        imageView.frame = CGRectMake(0, 0, self.view.bounds.width, self.view.bounds.height)
+        var visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .Light)) as UIVisualEffectView
+        visualEffectView.frame = imageView.bounds
+        imageView.addSubview(visualEffectView)
+        
+        self.view.addSubview(imageView)
         self.view.addSubview(label)
         self.view.addSubview(button)
         self.view.addSubview(tableView)
@@ -190,6 +200,9 @@ class ConfigViewController: UIViewController, UITableViewDelegate, UITableViewDa
         }
         else {
             button.enabled = true
+            button.setTitleColor(UIColor.whiteColor(), forState: UIControlState.Normal)
+            button.backgroundColor = UIColor(red: 0.9, green: 0.28, blue: 0.25, alpha: 1.0)
+            button.layer.borderColor = UIColor(red: 0.9, green: 0.28, blue: 0.25, alpha: 1.0).CGColor
         }
     }
 }
