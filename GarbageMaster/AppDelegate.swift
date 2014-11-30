@@ -20,11 +20,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         navigationController = UINavigationController(rootViewController: garbageListViewController)
         tabbarController.setViewControllers(NSArray(object: navigationController), animated: false)
-        navigationController.tabBarItem = UITabBarItem(title: "add", image: nil, selectedImage: nil)
+        
+        var tabBarItemImage = UIImage(named: "trash.png")
+        tabbarController.tabBarItem = UITabBarItem(title: "add", image: tabBarItemImage, selectedImage: nil)
+        navigationController.tabBarItem = UITabBarItem(title: "add", image: tabBarItemImage, selectedImage: nil)
         
         self.window = UIWindow(frame: UIScreen.mainScreen().bounds)
         
         self.window.rootViewController = tabbarController
+//        self.window.rootViewController = navigationController
         
         self.window.backgroundColor = UIColor.whiteColor()
         self.window.makeKeyAndVisible()

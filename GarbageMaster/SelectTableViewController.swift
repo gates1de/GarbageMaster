@@ -48,7 +48,14 @@ class SelectTableViewController: UITableViewController {
         let cellId: String = "Cell"
         let cell: UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: cellId)
         
-        cell.textLabel!.text = selectedArray[indexPath.row] as String
+        cell.textLabel.text = selectedArray[indexPath.row] as String
+        
+        cell.textLabel.lineBreakMode = NSLineBreakMode.ByCharWrapping
+        cell.textLabel.numberOfLines = 0
+//        cell.textLabel.frame.size.width = screenWidth * (3 / 4) - 20
+        cell.textLabel.frame.size.height = cell.frame.size.height
+        cell.textLabel.font = UIFont.systemFontOfSize(16)
+//        cellHeight = cell.frame.size.height
 
         return cell
     }
